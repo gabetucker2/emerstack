@@ -904,7 +904,7 @@ type Parameter struct {
 
 //TODO: insert values below into these params, create function to automate increment
 
-var paramsStack, envParams, inpParams *Stack
+var paramsStack, envStack, inpStack *Stack
 
 func SetupParams() { // initialize section by separating array to make it easier to manage
 
@@ -929,10 +929,10 @@ func SetupParams() { // initialize section by separating array to make it easier
 		"fear":          {false, -1, -1}, // contingent on env - update later
 		
 	})
-	envParams = paramsStack.GetMany(FIND_Lambda, func(card *Card) bool {
+	envStack = paramsStack.GetMany(FIND_Lambda, func(card *Card) bool {
 		return card.Val.(Parameter).envNotInp
 	})
-	inpParams = paramsStack.GetMany(FIND_Lambda, func(card *Card) bool {
+	inpStack = paramsStack.GetMany(FIND_Lambda, func(card *Card) bool {
 		return !card.Val.(Parameter).envNotInp
 	})
 
@@ -940,8 +940,8 @@ func SetupParams() { // initialize section by separating array to make it easier
 
 func Tsr_GetParam(tsr *etensor.Float32, paramName string) (ret float64) {
 
-	envSelect := envParams.Get(FIND_Key, paramName)
-	inpSelect := inpParams.Get(FIND_Key, paramName)
+	envSelect := envStack.Get(FIND_Key, paramName)
+	inpSelect := inpStack.Get(FIND_Key, paramName)
 	if envSelect != nil {
 		ret = tsr.FloatVal1D(envSelect.Idx)
 	} else if inpSelect != nil {
@@ -1100,7 +1100,7 @@ func (ss *Sim) Dynamics(returnOnChg bool) { // TODO: FIX DYNAMICS... this should
 
 		// ENVIRONMENT UPDATES; CALCULATE NEW STATE AND WRITE TO enviro TENSOR
 
-		for _, workingParamName := range envParams.GetMany(FIND_ALL, nil, RETURN_Keys) {
+		for _, workingParamName := range envStack.GetMany(FIND_ALL, nil, RETURN_Keys) {
 			SetParam(
 				enviro,
 				workingParamName,
