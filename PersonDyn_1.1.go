@@ -17,6 +17,8 @@ import (
 	"strconv"
 	"time"
 
+	. "github.com/gabetucker2/gostack"
+
 	"github.com/emer/emergent/emer"
 	"github.com/emer/emergent/env"
 	"github.com/emer/emergent/netview"
@@ -41,6 +43,7 @@ import (
 )
 
 func main() {
+
 	SetupParams()
 	TheSim.New()
 	TheSim.Config()
@@ -481,7 +484,7 @@ func (ss *Sim) Counters(train bool) string {
 
 func (ss *Sim) UpdateView(train bool) {
 	if ss.NetView != nil && ss.NetView.IsVisible() {
-		ss.NetView.Record(ss.Counters(train))
+		ss.NetView.Record(ss.Counters(train), 0) // TODO: random number 0 put here to fix compiler error, put in actual number
 		// note: essential to use Go version of update when called from another goroutine
 		ss.NetView.GoUpdate() // note: using counters is significantly slower..
 	}
@@ -901,119 +904,51 @@ type Parameter struct {
 
 //TODO: insert values below into these params, create function to automate increment
 
-var _params = map[string]Parameter{
-
-	//env
-	"friend":          {true, -1, -1},
-	"desk":            {true, -1, -1},
-	"food":            {true, -1, -1},
-	"mate":            {true, -1, -1},
-	"bed":             {true, -1, -1},
-	"socialsituation": {true, -1, -1},
-	"danger":          {true, -1, -1},
-
-	//inp
-	"affiliation":   {false, 0.02, -0.167},
-	"achievement":   {false, 0.0208, -0.083},
-	"hunger":        {false, 0.014, -0.143},
-	"sex":           {false, 0.0012, -0.333},
-	"sleep":         {false, 0.005, -0.0104},
-	"socialanxiety": {false, -1, -1}, // contingent on env - update later
-	"fear":          {false, -1, -1}, // contingent on env - update later
-}
-
-var envParams = map[string]Parameter{}
-var inpParams = map[string]Parameter{}
+var paramsStack, envParams, inpParams *Stack
 
 func SetupParams() { // initialize section by separating array to make it easier to manage
 
-	for k, v := range _params {
-		thisArr := map[string]Parameter{}
-		if v.envNotInp {
-			thisArr = envParams
-		} else {
-			thisArr = inpParams
-		}
-		thisArr[k] = v
-	}
+	paramsStack = MakeStack(map[string]Parameter{
 
-}
-
-func IfElseInt(test bool, intTrue int, intFalse int) (ret int) {
-
-	if test {
-		ret = intTrue
-	} else {
-		ret = intFalse
-	}
-
-	return
-
-}
-
-func GetMapKeys(targetMap map[string]Parameter) (keys []string) {
-
-	keys = make([]string, 0, len(targetMap))
-	for k := range targetMap {
-		keys = append(keys, k)
-	}
-
-	return
-
-}
-
-func IndexOf(arr []string, target string) (ret int) {
-
-	ret = -1
-	for i := 0; i < len(arr); i++ {
-		if target == arr[i] {
-			ret = i
-			break
-		}
-	}
-
-	return
-}
-
-func GetMapValByIndex(m map[string]Parameter, idx int) (ret Parameter) {
-
-	i := 0
-	for _, v := range m {
-		if i == idx {
-			ret = v
-			break
-		}
-		i++
-	}
-
-	return
-
-}
-
-func GetParamIdx(paramName string) (ret int) {
-
-	envIdx := IndexOf(GetMapKeys(envParams), paramName)
-	inpIdx := IndexOf(GetMapKeys(inpParams), paramName)
-	ret = IfElseInt(envIdx != -1, envIdx, inpIdx)
-
-	return
-
-}
-
-func Data_GetParam(paramName string) (ret Parameter) {
-
-	envIdx := IndexOf(GetMapKeys(envParams), paramName)
-	inpIdx := IndexOf(GetMapKeys(inpParams), paramName)
-	newIdx := IfElseInt(envIdx != -1, envIdx, len(envParams)+inpIdx)
-	ret = GetMapValByIndex(_params, newIdx)
-
-	return
+		//env
+		"friend":          {true, -1, -1},
+		"desk":            {true, -1, -1},
+		"food":            {true, -1, -1},
+		"mate":            {true, -1, -1},
+		"bed":             {true, -1, -1},
+		"socialsituation": {true, -1, -1},
+		"danger":          {true, -1, -1},
+	
+		//inp
+		"affiliation":   {false, 0.02, -0.167},
+		"achievement":   {false, 0.0208, -0.083},
+		"hunger":        {false, 0.014, -0.143},
+		"sex":           {false, 0.0012, -0.333},
+		"sleep":         {false, 0.005, -0.0104},
+		"socialanxiety": {false, -1, -1}, // contingent on env - update later
+		"fear":          {false, -1, -1}, // contingent on env - update later
+		
+	})
+	envParams = paramsStack.GetMany(FIND_Lambda, func(card *Card) bool {
+		return card.Val.(Parameter).envNotInp
+	})
+	inpParams = paramsStack.GetMany(FIND_Lambda, func(card *Card) bool {
+		return !card.Val.(Parameter).envNotInp
+	})
 
 }
 
 func Tsr_GetParam(tsr *etensor.Float32, paramName string) (ret float64) {
 
-	ret = tsr.FloatVal1D(GetParamIdx(paramName))
+	envSelect := envParams.Get(FIND_Key, paramName)
+	inpSelect := inpParams.Get(FIND_Key, paramName)
+	if envSelect != nil {
+		ret = tsr.FloatVal1D(envSelect.Idx)
+	} else if inpSelect != nil {
+		ret = tsr.FloatVal1D(inpSelect.Idx)
+	} else {
+		fmt.Println("ERROR: Tsr_GetParam could not find inputted paramName")
+	}
 
 	return
 
@@ -1029,7 +964,7 @@ func Param_Env_TimeEvolve(past *etensor.Float32, change *etensor.Float32, paramN
 
 func Param_Inp_TimeEvolve(bh *etensor.Float32, paramName string) (ret float64) {
 
-	param := Data_GetParam(paramName)
+	param := paramsStack.Get(FIND_Key, paramName).Val
 	ret = 1 - Tsr_GetParam(bh, paramName)*param.dx + bh.FloatVal1D(0)*param.activeX
 
 	return
@@ -1046,7 +981,7 @@ func Param_AvoidDanger(bh *etensor.Float32) (ret float64) {
 
 func Param_Activate(bh *etensor.Float32, paramName string) (ret float64) {
 
-	ret = Tsr_GetParam(bh, paramName) * Data_GetParam(paramName).activeX
+	ret = Tsr_GetParam(bh, paramName) * paramsStack.Get(FIND_Key, paramName).Val.activeX
 
 	return
 
@@ -1061,8 +996,10 @@ func ClampParamVal(val float64) (ret float64) {
 }
 
 func SetParam(tsr *etensor.Float32, paramName string, newVal float64) {
-
-	tsr.SetFloat1D(GetParamIdx(paramName), newVal)
+	
+	tsr.SetFloat1D(paramStack.GetMany(FIND_Lambda, func(card *Card) bool {
+		return card.Val.(Parameter).envNotInp
+	}).Get(FIND_Key, paramName).Idx, newVal)
 
 }
 
@@ -1163,7 +1100,7 @@ func (ss *Sim) Dynamics(returnOnChg bool) { // TODO: FIX DYNAMICS... this should
 
 		// ENVIRONMENT UPDATES; CALCULATE NEW STATE AND WRITE TO enviro TENSOR
 
-		for _, workingParamName := range GetMapKeys(envParams) {
+		for _, workingParamName := range envParams.GetMany(FIND_ALL, nil, RETURN_Keys) {
 			SetParam(
 				enviro,
 				workingParamName,
@@ -1265,10 +1202,8 @@ func (ss *Sim) Dynamics(returnOnChg bool) { // TODO: FIX DYNAMICS... this should
 			"socialanxiety": {false, -1, -1}, // contingent on env - update later
 			"fear":          {false, -1, -1}, // contingent on env - update later
 		*/
-		_theseParams := []string{
-			"affiliation", "achievement", "hunger", "sex", "sleep",
-		}
-		for _, workingParamName := range _theseParams {
+		
+		for _, workingParamName := range []string {"affiliation", "achievement", "hunger", "sex", "sleep"} {
 			SetParam(
 				enviro,
 				workingParamName,
@@ -2100,7 +2035,9 @@ func (ss *Sim) ConfigGui() *gi.Window {
 			ss.IsRunning = true
 			tbar.UpdateActions()
 			// single run
-			go ss.Dynamics(true)
+			
+			
+			//go ss.Dynamics(true)
 			ss.Stop()
 		}
 	})
