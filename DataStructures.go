@@ -1,33 +1,45 @@
 package main
 
+import (
+	. "github.com/gabetucker2/gostack"
+)
+
+var Parameters *Stack
+
 func SetupDataStructures() {
 	
-	paramsStack = MakeStack(map[string]Parameter{
+	Parameters = MakeStack(
 
-		//env
-		"friend":          {true, -1, -1},
-		"desk":            {true, -1, -1},
-		"food":            {true, -1, -1},
-		"mate":            {true, -1, -1},
-		"bed":             {true, -1, -1},
-		"socialsituation": {true, -1, -1},
-		"danger":          {true, -1, -1},
-	
-		//inp
-		"affiliation":   {false, 0.02, -0.167},
-		"achievement":   {false, 0.0208, -0.083},
-		"hunger":        {false, 0.014, -0.143},
-		"sex":           {false, 0.0012, -0.333},
-		"sleep":         {false, 0.005, -0.0104},
-		"socialanxiety": {false, -1, -1}, // contingent on env - update later
-		"fear":          {false, -1, -1}, // contingent on env - update later
-		
-	})
-	envStack = paramsStack.GetMany(FIND_Lambda, func(card *Card) bool {
-		return card.Val.(Parameter).envNotInp
-	})
-	inpStack = paramsStack.GetMany(FIND_Lambda, func(card *Card) bool {
-		return !card.Val.(Parameter).envNotInp
-	})
+		// parameters keys
+		[]string {"affiliation", "achievement", "hunger", "sex", "sleep", "socialAnxiety", "fear"},
+
+		// parameters vals
+		[]*Stack {
+
+			// affiliation
+			MakeStack(
+				// property keys
+				[]string {"enviro", "intero", "motiveBias", "behavior", "dx", "decrimentFunc", "actions", "relations"},
+
+				// property vals
+				[]any {
+					// pointer to the corresponding environmental value to this parameter stored in enviro
+					&enviro.Values[0],
+					// pointer to the corresponding interoceptive value to this parameter stored in intero
+					&intero.Values[0],
+					// motiveBias
+					
+					// behavior
+					// dx
+					// decrimentFunc
+					// actions
+					// relations
+				},
+			),
+
+			// TODO: fill the restetc
+
+		},
+	)
 
 }

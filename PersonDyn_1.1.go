@@ -5,7 +5,7 @@
 // Personality Model
 // Currently set up to do separate training of Pavlovian and Instrumental Training.
 // Interaction with Environment is still a work in progress
-//
+
 package main
 
 import (
@@ -17,13 +17,12 @@ import (
 	"strconv"
 	"time"
 
-	. "github.com/gabetucker2/gostack"
-
 	"github.com/emer/emergent/emer"
+	. "github.com/gabetucker2/gostack"
+	"github.com/gabetucker2/gogenerics"
 	"github.com/emer/emergent/env"
 	"github.com/emer/emergent/netview"
 	"github.com/emer/emergent/params"
-
 	// "github.com/emer/emergent/patgen"
 	"github.com/emer/emergent/prjn"
 	"github.com/emer/emergent/relpos"
@@ -43,21 +42,20 @@ import (
 )
 
 func main() {
-
+	gogenerics.RemoveUnusedError(MakeCard()) // TODO: remove after setting up shop
 	SetupDataStructures()
-
 	TheSim.New()
 	TheSim.Config()
 	if len(os.Args) > 1 {
 		TheSim.CmdArgs() // simple assumption is that any args = no gui -- could add explicit arg if you want
 	} else {
-		gimain.Main(func() {
-
-			guirun()
-
-		})
+		gimain.Main( func() { 
+		
+		guirun()
+		
+	})
 	}
-}
+	}
 
 func guirun() {
 	TheSim.Init()
@@ -78,83 +76,88 @@ var ParamSets = params.Sets{
 					"Prjn.Learn.Norm.On":     "true",
 					"Prjn.Learn.Momentum.On": "true",
 					"Prjn.Learn.WtBal.On":    "false",
-					"Prjn.Learn.Learn":       "true",
-					"Prjn.Learn.Lrate":       "0.04",
-					"Prjn.WtInit.Dist":       "Uniform",
-					"Prjn.WtInit.Mean":       "0.5",
-					"Prjn.WtInit.Var":        "0.25",
-					"Prjn.WtScale.Abs":       "1",
-				}},
-			{Sel: "#MotiveToApproach", Desc: "Set weight to fixed value of 1",
-				Params: params.Params{
-					"Prjn.Learn.Learn": "false",
-					"Prjn.Learn.Lrate": "0",
+					"Prjn.Learn.Learn": "true",
+					"Prjn.Learn.Lrate":  "0.04",
 					"Prjn.WtInit.Dist": "Uniform",
-					"Prjn.WtInit.Mean": "1",
-					"Prjn.WtInit.Var":  "0",
+					"Prjn.WtInit.Mean": "0.5",
+					"Prjn.WtInit.Var":  "0.25",
 					"Prjn.WtScale.Abs": "1",
+					
 				}},
-			{Sel: "#MotiveToAvoid", Desc: "Set weight to fixed value of 1",
+				{Sel: "#MotiveToApproach", Desc: "Set weight to fixed value of 1",
 				Params: params.Params{
 					"Prjn.Learn.Learn": "false",
-					"Prjn.Learn.Lrate": "0",
+					"Prjn.Learn.Lrate":  "0",
 					"Prjn.WtInit.Dist": "Uniform",
 					"Prjn.WtInit.Mean": "1",
 					"Prjn.WtInit.Var":  "0",
-					"Prjn.WtScale.Abs": "1",
+					"Prjn.WtScale.Abs": "1",		
 				}},
-			{Sel: "#VTA_DAToApproach", Desc: "Set weight to fixed value of 1, and weight scale of 2",
+				{Sel: "#MotiveToAvoid", Desc: "Set weight to fixed value of 1",
 				Params: params.Params{
 					"Prjn.Learn.Learn": "false",
-					"Prjn.Learn.Lrate": "0",
+					"Prjn.Learn.Lrate":  "0",
 					"Prjn.WtInit.Dist": "Uniform",
 					"Prjn.WtInit.Mean": "1",
 					"Prjn.WtInit.Var":  "0",
-					"Prjn.WtScale.Abs": "2",
+					"Prjn.WtScale.Abs": "1",		
 				}},
-			{Sel: "#VTA_DAToAvoid", Desc: "Set weight to fixed value of 1, and weight scale of 2, inhibitory connection",
+				{Sel: "#VTA_DAToApproach", Desc: "Set weight to fixed value of 1, and weight scale of 2",
 				Params: params.Params{
 					"Prjn.Learn.Learn": "false",
-					"Prjn.Learn.Lrate": "0",
+					"Prjn.Learn.Lrate":  "0",
 					"Prjn.WtInit.Dist": "Uniform",
 					"Prjn.WtInit.Mean": "1",
 					"Prjn.WtInit.Var":  "0",
-					"Prjn.WtScale.Abs": "2",
+					"Prjn.WtScale.Abs": "2",		
 				}},
-
+				{Sel: "#VTA_DAToAvoid", Desc: "Set weight to fixed value of 1, and weight scale of 2, inhibitory connection",
+				Params: params.Params{
+					"Prjn.Learn.Learn": "false",
+					"Prjn.Learn.Lrate":  "0",
+					"Prjn.WtInit.Dist": "Uniform",
+					"Prjn.WtInit.Mean": "1",
+					"Prjn.WtInit.Var":  "0",
+					"Prjn.WtScale.Abs": "2",	
+				}},
+				
+					
 			{Sel: "Layer", Desc: "using 2.3 inhib for all of network -- can explore",
 				Params: params.Params{
 					"Layer.Inhib.Layer.Gi": "2.3",
 					"Layer.Act.Gbar.L":     "0.1", // set explictly, new default, a bit better vs 0.2
-					"Layer.Act.XX1.Gain":   "100",
+					"Layer.Act.XX1.Gain" : "100",
 				}},
 			{Sel: "#Behavior", Desc: "Make Behavior layer selective for 1 behavior",
 				Params: params.Params{
 					"Layer.Inhib.Layer.Gi": "2.5",
-					"Layer.Act.XX1.Gain":   "200",
-				}},
-			{Sel: "#Approach", Desc: "",
+					"Layer.Act.XX1.Gain": "200",
+				}},	
+					{Sel: "#Approach", Desc: "",
 				Params: params.Params{
 					"Layer.Inhib.Layer.Gi": "2.3",
-					"Layer.Act.XX1.Gain":   "400",
-				}},
+					"Layer.Act.XX1.Gain": "400",
+				}},	
 			{Sel: "#Avoid", Desc: "",
 				Params: params.Params{
 					"Layer.Inhib.Layer.Gi": "2.3",
 					"Layer.Inhib.Layer.FB": "1.2",
-					"Layer.Act.XX1.Thr":    ".49",
-					"Layer.Act.XX1.Gain":   "400",
-					"Layer.Act.Gbar.I":     "1.35",
-				}},
-			{Sel: "#Hidden", Desc: "Make Hidden representation a bit sparser",
+					"Layer.Act.XX1.Thr": ".49",
+					"Layer.Act.XX1.Gain": "400",
+					"Layer.Act.Gbar.I": "1.35",
+				}},	
+				{Sel: "#Hidden", Desc: "Make Hidden representation a bit sparser",
 				Params: params.Params{
 					"Layer.Inhib.Layer.Gi": "2.5",
-				}},
-
+				}},	
+	
+				
+				
 			{Sel: ".Back", Desc: "top-down back-projections MUST have lower relative weight scale, otherwise network hallucinates",
 				Params: params.Params{
 					"Prjn.WtScale.Rel": "0.2",
 				}},
+			
 		},
 		"Sim": &params.Sheet{ // sim params apply to sim object
 			{Sel: "Sim", Desc: "best params always finish in this time",
@@ -202,12 +205,12 @@ var ParamSets = params.Sets{
 // as arguments to methods, and provides the core GUI interface (note the view tags
 // for the fields which provide hints to how things should be displayed).
 type Sim struct {
-	Net      *leabra.Network `view:"no-inline" desc:"the network -- click to view / edit parameters for layers, prjns, etc"`
-	Instr    *etable.Table   `view:"no-inline" desc:"Training pattern for Instrumental Learning"`
-	Pvlv     *etable.Table   `view:"no-inline" desc:"Training pattern for Pavlovian Learning"`
-	Trn      *etable.Table   `view:"no-inline" desc:"Table that controls type of training and number of Epochs of training"`
-	Training string          `view:"no-inline" desc:"Type of training: Pavlovian or Instrumental"`
-	World    *etable.Table   `view:"no-inline" desc:"Table that represents starting state and then each new state of the Internal and External world"`
+	Net          *leabra.Network   `view:"no-inline" desc:"the network -- click to view / edit parameters for layers, prjns, etc"`
+	Instr        *etable.Table     `view:"no-inline" desc:"Training pattern for Instrumental Learning"`
+	Pvlv         *etable.Table     `view:"no-inline" desc:"Training pattern for Pavlovian Learning"`
+	Trn    		 *etable.Table     `view:"no-inline" desc:"Table that controls type of training and number of Epochs of training"`
+	Training	 string			   `view:"no-inline" desc:"Type of training: Pavlovian or Instrumental"`
+	World 	 	 *etable.Table     `view:"no-inline" desc:"Table that represents starting state and then each new state of the Internal and External world"`
 	// WorldChanges *etable.Table     `view:"no-inline" desc:"Table that represents change in External world at each time step"`
 	TrnEpcLog    *etable.Table     `view:"no-inline" desc:"training epoch-level log data"`
 	TstEpcLog    *etable.Table     `view:"no-inline" desc:"testing epoch-level log data"`
@@ -247,35 +250,35 @@ type Sim struct {
 	NZero         int     `inactive:"+" desc:"number of epochs in a row with zero SSE"`
 
 	// internal state - view:"-"
-	SumErr          float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
-	SumSSE          float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
-	SumAvgSSE       float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
-	SumCosDiff      float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
-	Win             *gi.Window                  `view:"-" desc:"main GUI window"`
-	NetView         *netview.NetView            `view:"-" desc:"the network viewer"`
-	ToolBar         *gi.ToolBar                 `view:"-" desc:"the master toolbar"`
-	TrnEpcPlot      *eplot.Plot2D               `view:"-" desc:"the training epoch plot"`
-	TstEpcPlot      *eplot.Plot2D               `view:"-" desc:"the testing epoch plot"`
-	TstTrlPlot      *eplot.Plot2D               `view:"-" desc:"the test-trial plot"`
-	TstCycPlot      *eplot.Plot2D               `view:"-" desc:"the test-cycle plot"`
-	RunPlot         *eplot.Plot2D               `view:"-" desc:"the run plot"`
-	TrnEpcFile      *os.File                    `view:"-" desc:"log file"`
-	RunFile         *os.File                    `view:"-" desc:"log file"`
-	ValsTsrs        map[string]*etensor.Float32 `view:"-" desc:"map tensor for holding layer values"`
-	EnvpTsr         *etensor.Float32            `view:"-" desc:"for holding previous Environment values"`
-	IntpTsr         *etensor.Float32            `view:"-" desc:"for holding previous InteroState values"`
-	EnvcTsr         *etensor.Float32            `view:"-" desc:"for holding current Environment values"`
-	IntcTsr         *etensor.Float32            `view:"-" desc:"for holding current InteroState values"`
-	EnviroTsr       *etensor.Float32            `view:"-" desc:"for holding New Environment values"`
-	InteroTsr       *etensor.Float32            `view:"-" desc:"for holding New InteroState values"`
-	SaveWts         bool                        `view:"-" desc:"for command-line run only, auto-save final weights after each run"`
-	NoGui           bool                        `view:"-" desc:"if true, runing in no GUI mode"`
-	LogUpdateParams bool                        `view:"-" desc:"if true, print message for all params that are set"`
-	IsRunning       bool                        `view:"-" desc:"true if sim is running"`
-	StopNow         bool                        `view:"-" desc:"flag to stop running"`
-	NeedsNewRun     bool                        `view:"-" desc:"flag to initialize NewRun if last one finished"`
-	RndSeed         int64                       `view:"-" desc:"the current random seed"`
-	LastEpcTime     time.Time                   `view:"-" desc:"timer for last epoch"`
+	SumErr       float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
+	SumSSE       float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
+	SumAvgSSE    float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
+	SumCosDiff   float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
+	Win          *gi.Window                  `view:"-" desc:"main GUI window"`
+	NetView      *netview.NetView            `view:"-" desc:"the network viewer"`
+	ToolBar      *gi.ToolBar                 `view:"-" desc:"the master toolbar"`
+	TrnEpcPlot   *eplot.Plot2D               `view:"-" desc:"the training epoch plot"`
+	TstEpcPlot   *eplot.Plot2D               `view:"-" desc:"the testing epoch plot"`
+	TstTrlPlot   *eplot.Plot2D               `view:"-" desc:"the test-trial plot"`
+	TstCycPlot   *eplot.Plot2D               `view:"-" desc:"the test-cycle plot"`
+	RunPlot      *eplot.Plot2D               `view:"-" desc:"the run plot"`
+	TrnEpcFile   *os.File                    `view:"-" desc:"log file"`
+	RunFile      *os.File                    `view:"-" desc:"log file"`
+	ValsTsrs     map[string]*etensor.Float32 `view:"-" desc:"map tensor for holding layer values"`
+	EnvpTsr 	 *etensor.Float32 		     `view:"-" desc:"for holding previous Environment values"`
+	IntpTsr 	 *etensor.Float32 		     `view:"-" desc:"for holding previous InteroState values"`
+	EnvcTsr 	 *etensor.Float32 		     `view:"-" desc:"for holding current Environment values"`
+	IntcTsr 	 *etensor.Float32 		     `view:"-" desc:"for holding current InteroState values"`
+	EnviroTsr 	 *etensor.Float32 		     `view:"-" desc:"for holding New Environment values"`
+	InteroTsr 	 *etensor.Float32 		     `view:"-" desc:"for holding New InteroState values"`
+	SaveWts      bool                        `view:"-" desc:"for command-line run only, auto-save final weights after each run"`
+	NoGui        bool                        `view:"-" desc:"if true, runing in no GUI mode"`
+	LogSetParams bool                        `view:"-" desc:"if true, print message for all params that are set"`
+	IsRunning    bool                        `view:"-" desc:"true if sim is running"`
+	StopNow      bool                        `view:"-" desc:"flag to stop running"`
+	NeedsNewRun  bool                        `view:"-" desc:"flag to initialize NewRun if last one finished"`
+	RndSeed      int64                       `view:"-" desc:"the current random seed"`
+	LastEpcTime  time.Time                   `view:"-" desc:"timer for last epoch"`
 }
 
 // this registers this Sim Type and gives it properties that e.g.,
@@ -322,31 +325,37 @@ func (ss *Sim) Config() {
 	ss.ConfigTstTrlLog(ss.TstTrlLog)
 	ss.ConfigTstCycLog(ss.TstCycLog)
 	ss.ConfigRunLog(ss.RunLog)
-	ss.ConfigWorldTsrs() // Needs to be added to Config program
+	ss.ConfigWorldTsrs()  // Needs to be added to Config program
 }
+
+
 
 // are all of these tensors used/needed??
 
-func (ss *Sim) ConfigWorldTsrs() {
+func(ss *Sim) ConfigWorldTsrs() {
 	if ss.EnvpTsr == nil {
-		ss.EnvpTsr = etensor.NewFloat32([]int{1, 7}, nil, nil)
+		ss.EnvpTsr = etensor.NewFloat32([]int{1,7},nil,nil)
 	}
 	if ss.EnvcTsr == nil {
-		ss.EnvcTsr = etensor.NewFloat32([]int{1, 7}, nil, nil)
+		ss.EnvcTsr = etensor.NewFloat32([]int{1,7},nil,nil)
 	}
 	if ss.IntpTsr == nil {
-		ss.IntpTsr = etensor.NewFloat32([]int{1, 7}, nil, nil)
+		ss.IntpTsr = etensor.NewFloat32([]int{1,7},nil,nil)	
 	}
 	if ss.IntcTsr == nil {
-		ss.IntcTsr = etensor.NewFloat32([]int{1, 7}, nil, nil)
+		ss.IntcTsr = etensor.NewFloat32([]int{1,7},nil,nil)	
 	}
 	if ss.EnviroTsr == nil {
-		ss.EnviroTsr = etensor.NewFloat32([]int{1, 7}, nil, nil)
-	}
+		ss.EnviroTsr = etensor.NewFloat32([]int{1,7},nil,nil)	
+	}	
 	if ss.InteroTsr == nil {
-		ss.InteroTsr = etensor.NewFloat32([]int{1, 7}, nil, nil)
-	}
+		ss.InteroTsr = etensor.NewFloat32([]int{1,7},nil,nil)	
 }
+}
+
+
+
+
 
 func (ss *Sim) ConfigEnv() {
 	if ss.MaxRuns == 0 { // allow user override
@@ -383,7 +392,7 @@ func (ss *Sim) ConfigNet(net *leabra.Network) {
 	net.InitName(net, "Dynamic PersonalityModel")
 	enviro := net.AddLayer2D("Environment", 1, 7, emer.Input)
 	intero := net.AddLayer2D("InteroState", 1, 7, emer.Input)
-
+	
 	app := net.AddLayer2D("Approach", 1, 5, emer.Target)
 	av := net.AddLayer2D("Avoid", 1, 2, emer.Target)
 	hid := net.AddLayer2D("Hidden", 3, 7, emer.Hidden)
@@ -399,7 +408,7 @@ func (ss *Sim) ConfigNet(net *leabra.Network) {
 	// NewFull returns a new prjn.Full connectivity pattern
 	full := prjn.NewFull()
 	motb2app := prjn.NewOneToOne()
-
+	
 	motb2av := prjn.NewOneToOne()
 	motb2av.SendStart = 5
 
@@ -407,28 +416,29 @@ func (ss *Sim) ConfigNet(net *leabra.Network) {
 	net.ConnectLayers(enviro, av, full, emer.Forward)
 	net.ConnectLayers(intero, app, full, emer.Forward)
 	net.ConnectLayers(intero, av, full, emer.Forward)
-
+	
 	net.ConnectLayers(vta, app, full, emer.Forward)
 	net.ConnectLayers(vta, av, full, emer.Inhib) // Inhibitory connection
-
-	net.ConnectLayers(motb, app, motb2app, emer.Forward)
-	net.ConnectLayers(motb, av, motb2av, emer.Forward)
+	
+	
+	net.ConnectLayers(motb, app, motb2app,  emer.Forward)
+	net.ConnectLayers(motb, av, motb2av,  emer.Forward) 
 
 	net.BidirConnectLayers(hid, app, full)
 	net.BidirConnectLayers(hid, av, full)
 	net.BidirConnectLayers(hid, beh, full)
-
+	
 	// Commands that are used to position the layers in the Netview
-
+	
 	app.SetRelPos(relpos.Rel{Rel: relpos.Above, Other: "Environment", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
 	hid.SetRelPos(relpos.Rel{Rel: relpos.Above, Other: "Approach", YAlign: relpos.Front, XAlign: relpos.Left, YOffset: 0})
 	beh.SetRelPos(relpos.Rel{Rel: relpos.Above, Other: "Hidden", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
-
+	
 	intero.SetRelPos(relpos.Rel{Rel: relpos.RightOf, Other: "Environment", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
 	av.SetRelPos(relpos.Rel{Rel: relpos.RightOf, Other: "Approach", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
 	motb.SetRelPos(relpos.Rel{Rel: relpos.RightOf, Other: "Avoid", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
 	vta.SetRelPos(relpos.Rel{Rel: relpos.RightOf, Other: "InteroState", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
-
+	
 	// note: can set these to do parallel threaded computation across multiple cpus
 	// not worth it for this small of a model, but definitely helps for larger ones
 	// if Thread {
@@ -442,7 +452,7 @@ func (ss *Sim) ConfigNet(net *leabra.Network) {
 	// and thus removes error-driven learning -- but stats are still computed.
 
 	net.Defaults()
-	ss.UpdateParams("Network", ss.LogUpdateParams) // only set Network params
+	ss.SetParams("Network", ss.LogSetParams) // only set Network params
 	err := net.Build()
 	if err != nil {
 		log.Println(err)
@@ -461,7 +471,7 @@ func (ss *Sim) Init() {
 	ss.ConfigEnv() // re-config env just in case a different set of patterns was
 	// selected or patterns have been modified etc
 	ss.StopNow = false
-	ss.UpdateParams("", ss.LogUpdateParams) // all sheets
+	ss.SetParams("", ss.LogSetParams) // all sheets
 	ss.NewRun()
 	ss.UpdateView(true)
 }
@@ -485,7 +495,7 @@ func (ss *Sim) Counters(train bool) string {
 
 func (ss *Sim) UpdateView(train bool) {
 	if ss.NetView != nil && ss.NetView.IsVisible() {
-		ss.NetView.Record(ss.Counters(train), 0) // TODO: random number 0 put here to fix compiler error, put in actual number
+		ss.NetView.Record(ss.Counters(train), 0) // TODO: 0 was added arbitrarily to compile, update this later
 		// note: essential to use Go version of update when called from another goroutine
 		ss.NetView.GoUpdate() // note: using counters is significantly slower..
 	}
@@ -569,7 +579,7 @@ func (ss *Sim) ApplyInputs(en env.Env) {
 	ss.Net.InitExt() // clear any existing inputs -- not strictly necessary if always
 	// going to the same layers, but good practice and cheap anyway
 
-	lays := []string{"Environment", "InteroState", "Approach", "Avoid", "Behavior", "VTA_DA", "MotiveBias"}
+	lays := []string{"Environment", "InteroState", "Approach", "Avoid","Behavior", "VTA_DA", "MotiveBias"}
 	for _, lnm := range lays {
 		ly := ss.Net.LayerByName(lnm).(leabra.LeabraLayer).AsLeabra()
 		pats := en.State(ly.Nm)
@@ -747,117 +757,137 @@ func (ss *Sim) SaveWeights(filename gi.FileName) {
 // Following code is for training the network with both Pavlovian training and Instrumental training
 // controls order of training and number of Epochs of training by reading in an etable that has that information.
 
+
 func (ss *Sim) TrainPIT() {
 
-	for i := 0; i < 2; i++ {
+for i := 0; i < 2; i++ {
+		
+ss.Training = ss.Trn.CellString("Training", i)
+ss.MaxEpcs = int(ss.Trn.CellFloat("MaxEpoch", i))
 
-		ss.Training = ss.Trn.CellString("Training", i)
-		ss.MaxEpcs = int(ss.Trn.CellFloat("MaxEpoch", i))
 
-		switch ss.Training {
+switch ss.Training {
 
-		case "INSTRUMENTAL":
+	case "INSTRUMENTAL":
 
-			ss.TrainEnv.Epoch.Cur = 0 //set current epoch to 0 so that training starts from 0 epochs
+ss.TrainEnv.Epoch.Cur = 0  //set current epoch to 0 so that training starts from 0 epochs
 
-			// Need to set up training patterns.
-			ss.TrainEnv.Table = etable.NewIdxView(ss.Instr)
-			ss.TestEnv.Table = etable.NewIdxView(ss.Instr)
+// Need to set up training patterns.  	
+	ss.TrainEnv.Table = etable.NewIdxView(ss.Instr)
+	ss.TestEnv.Table = etable.NewIdxView(ss.Instr)
 
-			// Unlesion Hidden and Behavior layer to make sure all layers are unlesioned
-			ss.Net.LayerByName("Hidden").SetOff(false)
-			ss.Net.LayerByName("Behavior").SetOff(false)
+// Unlesion Hidden and Behavior layer to make sure all layers are unlesioned
+	ss.Net.LayerByName("Hidden").SetOff(false)
+	ss.Net.LayerByName("Behavior").SetOff(false)
 
-			// Load saved weights
-			// OpenWtsJSON opens trained weights
-			ss.Net.OpenWtsJSON("trained.wts")
+// Load saved weights
+// OpenWtsJSON opens trained weights
+		ss.Net.OpenWtsJSON("trained.wts")
+	
 
-			// Define Approach and Avoid as Input layers
-			// Define Behavior as a Target layer
-			ss.Net.LayerByName("Environment").SetType(emer.Input)
-			ss.Net.LayerByName("InteroState").SetType(emer.Input)
-			ss.Net.LayerByName("Approach").SetType(emer.Input)
-			ss.Net.LayerByName("Avoid").SetType(emer.Input)
-			ss.Net.LayerByName("Behavior").SetType(emer.Target)
 
-			// Lesion Environment and InteroState layers
-			ss.Net.LayerByName("Environment").SetOff(true)
-			ss.Net.LayerByName("InteroState").SetOff(true)
+// Define Approach and Avoid as Input layers
+// Define Behavior as a Target layer
+	ss.Net.LayerByName("Environment").SetType(emer.Input)
+	ss.Net.LayerByName("InteroState").SetType(emer.Input)
+	ss.Net.LayerByName("Approach").SetType(emer.Input)
+	ss.Net.LayerByName("Avoid").SetType(emer.Input)
+	ss.Net.LayerByName("Behavior").SetType(emer.Target)
+	
 
-			ss.Train()
+// Lesion Environment and InteroState layers
+	ss.Net.LayerByName("Environment").SetOff(true)
+	ss.Net.LayerByName("InteroState").SetOff(true)
 
-			// Unlesion Environment and InteroState layers
-			ss.Net.LayerByName("Environment").SetOff(false)
-			ss.Net.LayerByName("InteroState").SetOff(false)
 
-			// Save weights
-			ss.Net.SaveWtsJSON("trained.wts")
+	ss.Train()
 
-			// Define Environment and InteroState as Input layers
-			// Define Approach and Avoid as Target layers
-			// Define Behavior as a Target layer
-			// Makes sure that layers are set to default.
-			ss.Net.LayerByName("Environment").SetType(emer.Input)
-			ss.Net.LayerByName("InteroState").SetType(emer.Input)
-			ss.Net.LayerByName("Approach").SetType(emer.Target)
-			ss.Net.LayerByName("Avoid").SetType(emer.Target)
-			ss.Net.LayerByName("Behavior").SetType(emer.Target)
 
-		case "PAVLOV":
+// Unlesion Environment and InteroState layers
+	ss.Net.LayerByName("Environment").SetOff(false)
+	ss.Net.LayerByName("InteroState").SetOff(false)
 
-			ss.TrainEnv.Epoch.Cur = 0 //set current epoch to 0 so that training starts from 0 epochs
 
-			// Pavlovian Training
+// Save weights
+	ss.Net.SaveWtsJSON("trained.wts")
 
-			// Need to set up training patterns.
-			ss.TrainEnv.Table = etable.NewIdxView(ss.Pvlv)
-			ss.TestEnv.Table = etable.NewIdxView(ss.Pvlv)
 
-			// Define Environment and InteroState as Input layers
-			// Define Approach and Avoid as Target layers
-			// Define Behavior as a Compare layer
-			ss.Net.LayerByName("Environment").SetType(emer.Input)
-			ss.Net.LayerByName("InteroState").SetType(emer.Input)
-			ss.Net.LayerByName("Approach").SetType(emer.Target)
-			ss.Net.LayerByName("Avoid").SetType(emer.Target)
-			ss.Net.LayerByName("Behavior").SetType(emer.Target)
 
-			// Load saved weights
-			ss.Net.OpenWtsJSON("trained.wts")
+// Define Environment and InteroState as Input layers
+// Define Approach and Avoid as Target layers
+// Define Behavior as a Target layer
+// Makes sure that layers are set to default.
+	ss.Net.LayerByName("Environment").SetType(emer.Input)
+	ss.Net.LayerByName("InteroState").SetType(emer.Input)
+	ss.Net.LayerByName("Approach").SetType(emer.Target)
+	ss.Net.LayerByName("Avoid").SetType(emer.Target)	
+	ss.Net.LayerByName("Behavior").SetType(emer.Target)
 
-			// Lesion Hidden layer and Behavior layer
-			ss.Net.LayerByName("Hidden").SetOff(true)
-			ss.Net.LayerByName("Behavior").SetOff(true)
+	case "PAVLOV":
 
-			// Train until number of Epochs of training reached
-			ss.Train()
+ss.TrainEnv.Epoch.Cur = 0   //set current epoch to 0 so that training starts from 0 epochs
 
-			//Unlesion Hidden Layer and Behavior layer
-			ss.Net.LayerByName("Hidden").SetOff(false)
-			ss.Net.LayerByName("Behavior").SetOff(false)
+// Pavlovian Training
 
-			// Save weights
-			ss.Net.SaveWtsJSON("trained.wts")
+// Need to set up training patterns.  
+	ss.TrainEnv.Table = etable.NewIdxView(ss.Pvlv)
+	ss.TestEnv.Table = etable.NewIdxView(ss.Pvlv)
 
-			// Define Environment and InteroState as Input layers
-			// Define Approach and Avoid as Target layers
-			// Define Behavior as a Target layer
-			// Makes sure that layers are set to default.
+// Define Environment and InteroState as Input layers
+// Define Approach and Avoid as Target layers
+// Define Behavior as a Compare layer
+	ss.Net.LayerByName("Environment").SetType(emer.Input)
+	ss.Net.LayerByName("InteroState").SetType(emer.Input)
+	ss.Net.LayerByName("Approach").SetType(emer.Target)
+	ss.Net.LayerByName("Avoid").SetType(emer.Target)
+	ss.Net.LayerByName("Behavior").SetType(emer.Target)
 
-			ss.Net.LayerByName("Environment").SetType(emer.Input)
-			ss.Net.LayerByName("InteroState").SetType(emer.Input)
-			ss.Net.LayerByName("Approach").SetType(emer.Target)
-			ss.Net.LayerByName("Avoid").SetType(emer.Target)
-			ss.Net.LayerByName("Behavior").SetType(emer.Target)
+// Load saved weights
+		ss.Net.OpenWtsJSON("trained.wts")
+	
 
+// Lesion Hidden layer and Behavior layer
+	ss.Net.LayerByName("Hidden").SetOff(true)
+	ss.Net.LayerByName("Behavior").SetOff(true)
+
+
+// Train until number of Epochs of training reached
+	ss.Train()
+
+//Unlesion Hidden Layer and Behavior layer
+	ss.Net.LayerByName("Hidden").SetOff(false)
+	ss.Net.LayerByName("Behavior").SetOff(false)
+
+
+// Save weights
+	ss.Net.SaveWtsJSON("trained.wts")
+	
+	
+// Define Environment and InteroState as Input layers
+// Define Approach and Avoid as Target layers
+// Define Behavior as a Target layer
+// Makes sure that layers are set to default.
+
+	ss.Net.LayerByName("Environment").SetType(emer.Input)
+	ss.Net.LayerByName("InteroState").SetType(emer.Input)
+	ss.Net.LayerByName("Approach").SetType(emer.Target)
+	ss.Net.LayerByName("Avoid").SetType(emer.Target)	
+	ss.Net.LayerByName("Behavior").SetType(emer.Target)
+
+	
+	
 		}
 	}
 }
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Testing
 
 // TestTrial runs one trial of testing -- always sequentially presented inputs
+
 
 func (ss *Sim) TestTrial(returnOnChg bool) {
 	ss.TestEnv.Step()
@@ -880,116 +910,49 @@ func (ss *Sim) TestTrial(returnOnChg bool) {
 	ss.LogTstTrl(ss.TstTrlLog)
 }
 
-// This function has been heavily modified from the TestTrial function  to dynamically change the External and Internal world state as a function of the model's behavior and exogenous changes.
+
+
+
+
+// This function has been heavily modified from the TestTrial function  to dynamically change the External and Internal world state as a function of the model's behavior and exogenous changes.  
 // WARNING!!! THIS CODE IS A WORK IN PROGRESS. IT HAS NOT BEEN FINISHED OR TESTED.
+
 
 // World file: first row represents initial State of the World.  Subsequent rows initially represent Exogenous Changes to the world.
 // Will calculate new state of the world (next row, t) by recording: 1) previous Environment, previous Interostate, (t-1)
 // 2) Behavior (t-1), then 3) calculate new Environment and Interostate (t) by calculating a) changes in both Environment and Interostate
-// due to behavior, b) changes over time (e.g., getting hungry), and c) exogenous changes in the world represented in row t of World, and
-// 4) write all of this into row t of World.
+// due to behavior, b) changes over time (e.g., getting hungry), and c) exogenous changes in the world represented in row t of World, and 
+// 4) write all of this into row t of World.  
 
-//
+// 
 //
 // WARNING!! Dynamics only runs one trial. Need to have something like TestAll call Dynamics until stopping point reached.
 //
 //
 
-// GABE CHANGES //////////////////////////////////////////////////////////
+var enviro, intero *etensor.Float32
 
-type Parameter struct {
-	envNotInp bool
-	dx        float64
-	activeX   float64
-}
-
-var paramsStack, envStack, inpStack *Stack
-
-func Tsr_GetParam(tsr *etensor.Float32, paramName string) (ret float64) {
-
-	envSelect := envStack.Get(FIND_Key, paramName)
-	inpSelect := inpStack.Get(FIND_Key, paramName)
-	if envSelect != nil {
-		ret = tsr.FloatVal1D(envSelect.Idx)
-	} else if inpSelect != nil {
-		ret = tsr.FloatVal1D(inpSelect.Idx)
-	} else {
-		fmt.Println("ERROR: Tsr_GetParam could not find inputted paramName")
-	}
-
-	return
-
-}
-
-func Param_Env_TimeEvolve(past *etensor.Float32, change *etensor.Float32, paramName string) (ret float64) {
-
-	ret = Tsr_GetParam(past, "friend") + Tsr_GetParam(change, "friend")
-
-	return
-
-}
-
-func Param_Inp_TimeEvolve(bh *etensor.Float32, paramName string) (ret float64) {
-
-	param := paramsStack.Get(FIND_Key, paramName).Val.(*Parameter)
-	ret = 1 - Tsr_GetParam(bh, paramName)*param.dx + bh.FloatVal1D(0)*param.activeX
-
-	return
-
-}
-
-func Param_AvoidDanger(bh *etensor.Float32) (ret float64) {
-
-	ret = Tsr_GetParam(bh, "danger") * -1
-
-	return
-
-}
-
-func Param_Activate(bh *etensor.Float32, paramName string) (ret float64) {
-
-	ret = Tsr_GetParam(bh, paramName) * paramsStack.Get(FIND_Key, paramName).Val.(*Parameter).activeX
-
-	return
-
-}
-
-func ClampParamVal(val float64) (ret float64) {
-
-	ret = float64(mat32.Clamp(float32(val), 0, 1))
-
-	return
-
-}
-
-func SetParam(tsr *etensor.Float32, paramName string, newVal float64) {
-	
-	tsr.SetFloat1D(paramsStack.GetMany(FIND_Lambda, func(card *Card) bool {
-		return card.Val.(Parameter).envNotInp
-	}).Get(FIND_Key, paramName).Idx, newVal)
-
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-func (ss *Sim) Dynamics(returnOnChg bool) { // TODO: FIX DYNAMICS... this should be called every frame but isn't.  Also it crashes the program
+func (ss *Sim) Dynamics(returnOnChg bool) {
 	ss.TestEnv.Step()
 
+
 	// TestTrial is called periodically during training, by default.  TestInterval is currently set to -1 to turn that off.
+	
+ if ss.TestEnv.Trial.Cur == 0 {
+ 		ss.TestEnv.Table = etable.NewIdxView(ss.World) // define a World Struc item and then use "ss.World"
+ 														// datatable for World is read in by OpenPats function
+														// row 0 of World is initial state of World (Enviro and Interostate)
+														// subsequent rows will initially have Changes, and these Changes will be used in conjunction with other info
+														// to calculate new state of the World
+		ss.TestEnv.NewOrder()	
+	
+	// basic idea is to call this if you read in a new testing file and then have it update the indexes and the order
+	// so that they will correspond to the size of the new file
+	// does ss.TestEnv.NewOrder() work properly as long as sequential is set in the ConfigEnv function?
+	
+}
 
-	if ss.TestEnv.Trial.Cur == 0 {
-		ss.TestEnv.Table = etable.NewIdxView(ss.World) // define a World Struc item and then use "ss.World"
-		// datatable for World is read in by OpenPats function
-		// row 0 of World is initial state of World (Enviro and Interostate)
-		// subsequent rows will initially have Changes, and these Changes will be used in conjunction with other info
-		// to calculate new state of the World
-		ss.TestEnv.NewOrder()
 
-		// basic idea is to call this if you read in a new testing file and then have it update the indexes and the order
-		// so that they will correspond to the size of the new file
-		// does ss.TestEnv.NewOrder() work properly as long as sequential is set in the ConfigEnv function?
-
-	}
 
 	// Query counters FIRST
 	_, _, chg := ss.TestEnv.Counter(env.Epoch)
@@ -1003,300 +966,208 @@ func (ss *Sim) Dynamics(returnOnChg bool) { // TODO: FIX DYNAMICS... this should
 		}
 	}
 
-	en := ss.TestEnv // would this line be correct? should this be set up with the &
+		en := ss.TestEnv   // would this line be correct? should this be set up with the &
+		
+		// should we put the if statement here and then the function call that updates the WorldState?
+	if ss.TestEnv.Trial.Cur < 1 { 
 
-	// should we put the if statement here and then the function call that updates the WorldState?
-	bh := etensor.NewFloat32([]int{0, 0}, nil, nil) // define before conditional assignments to avoid ambiguity
-	if ss.TestEnv.Trial.Cur < 1 {
 
-		// Code to read input values for Environment and Interoceptive State
+	// Code to read input values for Environment and Interoceptive State
+	
 
-		//		ss.ValsTsr("Envp") = en.State("Environment") // previous Environment
-		//		ss.ValsTsr("Intp") = en.State("InteroState")	  // previous InteroState
 
+//		ss.ValsTsr("Envp") = en.State("Environment") // previous Environment
+//		ss.ValsTsr("Intp") = en.State("InteroState")	  // previous InteroState
+		
 		ss.EnvpTsr = en.State("Environment").(*etensor.Float32) // previous Environment
-		ss.IntpTsr = en.State("InteroState").(*etensor.Float32) // previous InteroState
-
+		ss.IntpTsr = en.State("InteroState").(*etensor.Float32)	  // previous InteroState
+		
 		ss.ApplyInputs(&ss.TestEnv)
-		ss.AlphaCyc(false) // !train
-
-		// Code to read Behavior activations after AlphaCyc applied
+		ss.AlphaCyc(false)   // !train
+	
+	// Code to read Behavior activations after AlphaCyc applied
 
 		beh := ss.Net.LayerByName("Behavior").(leabra.LeabraLayer).AsLeabra()
-		bh = ss.ValsTsr("Behavior")    // see ra25 example for this method for a reusable map of tensors
+		bh := ss.ValsTsr("Behavior") // see ra25 example for this method for a reusable map of tensors
 		beh.UnitValsTensor(bh, "ActM") // read the actMs into tensor
+
 
 		ss.TrialStats(false) // !accumulate
 		ss.LogTstTrl(ss.TstTrlLog)
-
+		
 	} else {
-		// take previous inputs (cur-1), retrieve current values(cur) and behavior activations (see below)
-		// calculate new state of Environment and InteroState and put in TestEnv Table
-		// do below
-
-		// NEED TO READ UP ON APPROPRIATE WAY TO USE ASSIGNMENT STATEMENTS VERSUS =
-
-		// take envp, intp, and bh and then with the following, calculate new World State
-		// 		en := &ss.TestEnv  // already assigned in "if statement"
+	// take previous inputs (cur-1), retrieve current values(cur) and behavior activations (see below)
+	// calculate new state of Environment and InteroState and put in TestEnv Table
+	// do below 
+	
+	
+	// NEED TO READ UP ON APPROPRIATE WAY TO USE ASSIGNMENT STATEMENTS VERSUS =
+	
+	
+	
+	
+// take envp, intp, and beh and then with the following, calculate new World State
+// 		en := &ss.TestEnv  // already assigned in "if statement" 
 
 		envc := en.State("Environment").(*etensor.Float32) // exogenous Changes to current Environment
 		// intc := en.State("InteroState").(*etensor.Float32)	  // exogenous Changes to current InteroState
-		// Are there exogenous changes to Interostate?  maybe we don't need intc.
-
-		//		envc := ss.EnvcTsr // current Environment
-		//		intc := ss.IntcTsr	  // current InteroState
-
+				// Are there exogenous changes to Interostate?  maybe we don't need intc.  
+		
+//		envc := ss.EnvcTsr // current Environment
+//		intc := ss.IntcTsr	  // current InteroState
+		
 		envp := ss.EnvpTsr
 		intp := ss.IntpTsr
-
-		enviro := ss.EnviroTsr // This is used to create new Environment representation
-		intero := ss.InteroTsr // This is used to create new InteroState representation
-
-		// Then calculate new enviro and new intero which will be written to the World datatable
-
-		// This code takes the tensor from the Behavior layer and then finds the index of the most strongly activated behavior.
-
-		bh = ss.ValsTsr("Behavior")
-		_, _, _, bidx := bh.Range()
-
-		// then set the Behavior tensor to all zeros and then set the value at the index to 1.
-		// so this tensor identifies which behavior is Performed or Enacted
-
-		bh.SetZeros()
-		bh.SetFloat1D(bidx, 1.0)
-
-		// ENVIRONMENT UPDATES; CALCULATE NEW STATE AND WRITE TO enviro TENSOR
-
-		// TODO: update this segment
-		// envStack.GetMany(FIND_All, nil, RETURN_Keys).Lambda(func(card *Card, _ ...any) {
-		// 	workingParamName := card.Val.(string)
-		// 	SetParam(
-		// 		enviro,
-		// 		workingParamName,
-		// 		ClampParamVal(
-		// 			Param_Env_TimeEvolve(envp, envc, workingParamName)+
-		// 				Param_AvoidDanger(bh),
-		// 		),
-		// 	)
-		// })
-
-		// PREVIOUS VERSION WHERE EACH PARAMETER UPDATE IS NOT NECESSARILY THE SAME (LIKE DR. READ'S ORIGINAL):
-
-		/*
-			workingParamName := "" // param to update as you update each parameter; makes explicit the section being updated
-
-			workingParamName = "friend"
-			SetParam(
-				enviro,
-				workingParamName,
-				ClampParamVal(
-					Param_Env_TimeEvolve(envp, envc, workingParamName)+
-						Param_AvoidDanger(bh),
-				),
-			)
-
-			workingParamName = "desk"
-			SetParam(
-				enviro,
-				workingParamName,
-				ClampParamVal(
-					Param_Env_TimeEvolve(envp, envc, workingParamName)+
-						Param_AvoidDanger(bh),
-				),
-			)
-
-			// NOTICE: added behavior, which wasn't there before (prev line was food := mat32.Clamp(float32((envp.FloatVal1D(2) + envc.FloatVal1D(2) + bh.FloatVal1D(2) * eat_food_decr)), 0, 1))
-			workingParamName = "food"
-			SetParam(
-				enviro,
-				workingParamName,
-				ClampParamVal(
-					Param_Env_TimeEvolve(envp, envc, workingParamName)+
-						Param_AvoidDanger(bh)+
-						Param_Activate(bh, workingParamName), // TODO: double-check placement of eating function from Dr. Read's first draft... do we want it to eat every timeframe?  If not, then this update is identical to all other environmental state updates, meaning we can generalize all 7 of these parameters into one function which iterates through envParam keys as the only varying factor
-				),
-			)
-
-			workingParamName = "mate"
-			SetParam(
-				enviro,
-				workingParamName,
-				ClampParamVal(
-					Param_Env_TimeEvolve(envp, envc, workingParamName)+
-						Param_AvoidDanger(bh),
-				),
-			)
-
-			workingParamName = "bed"
-			SetParam(
-				enviro,
-				workingParamName,
-				ClampParamVal(
-					Param_Env_TimeEvolve(envp, envc, workingParamName)+
-						Param_AvoidDanger(bh),
-				),
-			)
-
-			// NOTICE: switched from socialSit to danger for one of the values being added to the new tsr value (prev line was bed := mat32.Clamp(float32((envp.FloatVal1D(4) + envc.FloatVal1D(4) + bh.FloatVal1D(6) * (-1))), 0, 1))
-			workingParamName = "socialsituation"
-			SetParam(
-				enviro,
-				workingParamName,
-				ClampParamVal(
-					Param_Env_TimeEvolve(envp, envc, workingParamName)+
-						Param_AvoidDanger(bh),
-				),
-			)
-
-			workingParamName = "danger"
-			SetParam(
-				enviro,
-				workingParamName,
-				ClampParamVal(
-					Param_Env_TimeEvolve(envp, envc, workingParamName)+
-						Param_AvoidDanger(bh),
-				),
-			)
-		*/
-
-		// INTEROSTATE UPDATES: CALCULATE NEW STATE AND WRITE TO intero TENSOR
-		// Clamp restricts result to range of 0 to 1.
-
-		/*
-			"affiliation":   {false, 0.02, -0.167},
-			"achievement":   {false, 0.0208, -0.083},
-			"hunger":        {false, 0.014, -0.143},
-			"sex":           {false, 0.0012, -0.333},
-			"sleep":         {false, 0.005, -0.0104},
-			"socialanxiety": {false, -1, -1}, // contingent on env - update later
-			"fear":          {false, -1, -1}, // contingent on env - update later
-		*/
 		
-		for _, workingParamName := range []string {"affiliation", "achievement", "hunger", "sex", "sleep"} {
-			SetParam(
-				enviro,
-				workingParamName,
-				ClampParamVal(
-					Tsr_GetParam(intp, workingParamName)+
-						Param_Inp_TimeEvolve(bh, workingParamName),
-				),
-			)
-		}
+		enviro = ss.EnviroTsr  // This is used to create new Environment representation
+    	intero = ss.InteroTsr   // This is used to create new InteroState representation
+	
+// Then calculate new enviro and new intero which will be written to the World datatable
 
-		workingParamName := "socialanxiety"
-		SetParam(
-			intero,
-			workingParamName,
-			ClampParamVal(
-				Tsr_GetParam(enviro, "socialsituation"),
-			),
-		)
 
-		workingParamName = "fear"
-		SetParam(
-			intero,
-			workingParamName,
-			ClampParamVal(
-				Tsr_GetParam(enviro, "danger"),
-			),
-		)
+// This code takes the tensor from the Behavior layer and then finds the index of the most strongly activated behavior.
 
-		/*
-			// first implemented sample where they're not all necessarily the same... stopped implementing each individually in lieu of a general for loop
-			workingParamName = "affiliation"
-			SetParam(
-				intero,
-				workingParamName,
-				ClampParamVal(
-					Tsr_GetParam(intp, workingParamName)+
-						Param_Inp_TimeEvolve(bh, workingParamName),
-				),
-			)
+bh := ss.ValsTsr("Behavior")
+_, _, _, bidx := bh.Range()
 
-			// Achievement
-			ach := mat32.Clamp(float32((intp.FloatVal1D(1) + (1 - bh.FloatVal1D(1)*ach_incr + bh.FloatVal1D(1)*stdy_ach_decr))), 0, 1)
-			intero.SetFloat1D(1, float64(ach))
+// then set the Behavior tensor to all zeros and then set the value at the index to 1.
+// so this tensor identifies which behavior is Performed or Enacted
 
-			// Hunger
-			hngr := mat32.Clamp(float32((intp.FloatVal1D(2) + (1 - bh.FloatVal1D(2)*hngr_incr + bh.FloatVal1D(2)*eat_hngr_decr))), 0, 1)
-			intero.SetFloat1D(2, float64(hngr))
+bh.SetZeros()
+bh.SetFloat1D(bidx, 1.0)
 
-			// Sex
-			sex := mat32.Clamp(float32((intp.FloatVal1D(3) + (1 - bh.FloatVal1D(3)*sex_incr + bh.FloatVal1D(3)*sex_decr))), 0, 1)
-			intero.SetFloat1D(3, float64(sex))
+// All of these values are based on lab discussion and "logic". Not based on research.  Would be nice to get research
+// decrements in food available (Environment) with each relevant behavior. Here probably just applies to Eat
+eat_food_decr := -0.143 
 
-			// Sleep
-			slp := mat32.Clamp(float32((intp.FloatVal1D(4) + (1 - bh.FloatVal1D(4)*slp_incr + bh.FloatVal1D(4)*slp_decr))), 0, 1)
-			intero.SetFloat1D(4, float64(slp))
+// decrements in Interoceptive states with each relevant behavior
+// 
+hngt_aff_decr := -0.167 
+// hngt_sa_decr := -0.1 
+stdy_ach_decr := -0.083 
+eat_hngr_decr := -0.143 
 
-			// Social Anxiety
-			sanx := enviro.FloatVal1D(5)
-			intero.SetFloat1D(5, sanx)
+sex_decr := -0.333 
+slp_decr := -0.0104 
 
-			// Fear
-			fear := enviro.FloatVal1D(6)
-			intero.SetFloat1D(6, fear)
+// these are the increment per time step for each of the Interostates
+aff_incr := 0.02 
+ach_incr := 0.0208 
+hngr_incr := 0.014 
+sex_incr := 0.0012 
+slp_incr := 0.005 
 
-		*/
+// ENVIRONMENT UPDATES; CALCULATE NEW STATE AND WRITE TO enviro TENSOR
 
-		// write new Environment and InteroStates into World data table
+// Friend
+frnd := mat32.Clamp(float32((envp.FloatVal1D(0) + envc.FloatVal1D(0) + bh.FloatVal1D(6) * (-1))), 0, 1)
+enviro.SetFloat1D(0, float64(frnd))
 
-		////////////////////////////////////////////////////////////////////////////////////////
-		// NEED TO CHECK WHETHER I AM WRITING THE NEW ENVIRO AND INTERO VALUES INTO THE TABLE PROPERLY
-		////////////////////////////////////////////////////////////////////////////////////////
-		// dt will probably be something like &ss.TestEnv
+// Desk
+desk := mat32.Clamp(float32((envp.FloatVal1D(1) + envc.FloatVal1D(1) + bh.FloatVal1D(6) * (-1))), 0, 1)
+enviro.SetFloat1D(1, float64(desk))
 
-		trl := ss.TestEnv.Trial.Cur
-		row := trl
-		dt := ss.World
+// Food
+food := mat32.Clamp(float32((envp.FloatVal1D(2) + envc.FloatVal1D(2) + bh.FloatVal1D(2) * eat_food_decr)), 0, 1)
+enviro.SetFloat1D(2,	float64(food))
 
-		dt.SetCellTensor("Environment", row, enviro)
-		dt.SetCellTensor("InteroState", row, intero)
+//Mate
+mate := mat32.Clamp(float32((envp.FloatVal1D(3) + envc.FloatVal1D(3) + bh.FloatVal1D(6) * (-1))), 0, 1)
+enviro.SetFloat1D(3, float64(mate))
 
-		// Apply new Environment and InteroState to network
+// Bed
+bed := mat32.Clamp(float32((envp.FloatVal1D(4) + envc.FloatVal1D(4) + bh.FloatVal1D(6) * (-1))), 0, 1)
+enviro.SetFloat1D(4, float64(bed))
 
+// Social Situation
+socsit := mat32.Clamp(float32((envp.FloatVal1D(5) + envc.FloatVal1D(5) + bh.FloatVal1D(5) * (-1))), 0, 1)
+enviro.SetFloat1D(5, float64(socsit))
+
+// Danger
+dngr := mat32.Clamp(float32((envp.FloatVal1D(6) + envc.FloatVal1D(6) + bh.FloatVal1D(6) * (-1))), 0, 1)
+enviro.SetFloat1D(6, float64(dngr))
+
+
+// INTEROSTATE UPDATES: CALCULATE NEW STATE AND WRITE TO intero TENSOR
+// Clamp restricts result to range of 0 to 1.
+
+// Affiliation
+aff := mat32.Clamp(float32((intp.FloatVal1D(0) + (1-bh.FloatVal1D(0) * aff_incr + bh.FloatVal1D(0)*hngt_aff_decr))), 0, 1)
+intero.SetFloat1D(0, float64(aff))
+
+// Achievement
+ach := mat32.Clamp(float32((intp.FloatVal1D(1) + (1-bh.FloatVal1D(1) * ach_incr + bh.FloatVal1D(1)*stdy_ach_decr))), 0, 1)
+intero.SetFloat1D(1, float64(ach))
+
+// Hunger
+hngr := mat32.Clamp(float32((intp.FloatVal1D(2) + (1-bh.FloatVal1D(2) * hngr_incr + bh.FloatVal1D(2)* eat_hngr_decr))), 0, 1)
+intero.SetFloat1D(2, float64(hngr))
+
+// Sex
+sex := mat32.Clamp(float32((intp.FloatVal1D(3) + (1 - bh.FloatVal1D(3) * sex_incr + bh.FloatVal1D(3)* sex_decr))), 0, 1)
+intero.SetFloat1D(3, float64(sex))
+
+// Sleep
+slp := mat32.Clamp(float32((intp.FloatVal1D(4) + (1 - bh.FloatVal1D(4) * slp_incr + bh.FloatVal1D(4)* slp_decr))), 0, 1)
+intero.SetFloat1D(4, float64(slp))
+
+// Social Anxiety
+sanx := enviro.FloatVal1D(5)
+intero.SetFloat1D(5, sanx)
+
+// Fear
+fear := enviro.FloatVal1D(6)
+intero.SetFloat1D(6, fear)
+
+
+// write new Environment and InteroStates into World data table
+
+////////////////////////////////////////////////////////////////////////////////////////
+// NEED TO CHECK WHETHER I AM WRITING THE NEW ENVIRO AND INTERO VALUES INTO THE TABLE PROPERLY
+////////////////////////////////////////////////////////////////////////////////////////
+// dt will probably be something like &ss.TestEnv
+
+	trl := ss.TestEnv.Trial.Cur
+	row := trl
+	dt := ss.World
+
+	dt.SetCellTensor("Environment", row, enviro)
+	dt.SetCellTensor("InteroState", row, intero)
+	
+// Apply new Environment and InteroState to network
+		
 		ss.ApplyInputs(&ss.TestEnv)
-		ss.AlphaCyc(false) // !train
+		ss.AlphaCyc(false)   // !train
+	
+// Code to read Behavior activations after AlphaCyc applied
 
-		// Code to read Behavior activations after AlphaCyc applied
+	beh := ss.Net.LayerByName("Behavior").(leabra.LeabraLayer).AsLeabra()
+	bh = ss.ValsTsr("Behavior") // see ra25 example for this method for a reusable map of tensors
+	beh.UnitValsTensor(bh, "ActM") // read the actMs into tensor
 
-		beh := ss.Net.LayerByName("Behavior").(leabra.LeabraLayer).AsLeabra()
-		bh = ss.ValsTsr("Behavior")    // see ra25 example for this method for a reusable map of tensors
-		beh.UnitValsTensor(bh, "ActM") // read the actMs into tensor
+	
+	ss.EnvpTsr = enviro  // saves current environment  as previous Environment for next step
+	ss.IntpTsr = intero	  // saves current InteroState as previous InteroState for next step
 
-		ss.EnvpTsr = enviro // saves current environment  as previous Environment for next step
-		ss.IntpTsr = intero // saves current InteroState as previous InteroState for next step
 
-		ss.TrialStats(false) // !accumulate
-		ss.LogTstTrl(ss.TstTrlLog)
+	ss.TrialStats(false) // !accumulate
+	ss.LogTstTrl(ss.TstTrlLog)
+
 
 	}
 }
 
+
 /*
 func (ss &Sim) UpdateWorld() {
-
-
-
 // Code to read previous or t-1 Environment and InteroState values from Network
-
 	enviro := ss.Net.LayerByName(“Environment”).(leabra.LeabraLayer).AsLeabra()
 	envp := ss.ValsTsr(“Environment”) // see ra25 example for this method for a reusable map of tensors
 	enviro.UnitValsTensor(envp, "Act”) // read the acts into tensor
-
 	intero := ss.Net.LayerByName(“InteroState”).(leabra.LeabraLayer).AsLeabra()
 	intp := ss.ValsTsr(“InteroState) // see ra25 example for this method for a reusable map of tensors
 	intero.UnitValsTensor(intp, "Act”) // read the acts into tensor
-
-
-
-
-
 }
-
-
-
-
 */
 
 // TestItem tests given item which is at given index in test item list
@@ -1310,13 +1181,21 @@ func (ss *Sim) TestItem(idx int) {
 	ss.TestEnv.Trial.Cur = cur
 }
 
+
 // Need some version of TestAll and RunTestAll to run the testing with a new environment
 
 // TestAll runs through the full set of testing items
 func (ss *Sim) TestAll() {
 	ss.TestEnv.Init(ss.TrainEnv.Run.Cur)
-	//	ss.World = Clone(ss.WorldChanges)
-	//	ss.TestEnv.Table = etable.NewIdxView(ss.World)
+//	ss.World = Clone(ss.WorldChanges)
+//	ss.TestEnv.Table = etable.NewIdxView(ss.World)
+
+
+
+
+
+
+
 
 	for {
 		ss.TestTrial(true) // return on change -- don't wrap
@@ -1345,27 +1224,27 @@ func (ss *Sim) ParamsName() string {
 	return ss.ParamSet
 }
 
-// UpdateParams sets the params for "Base" and then current ParamSet.
+// SetParams sets the params for "Base" and then current ParamSet.
 // If sheet is empty, then it applies all avail sheets (e.g., Network, Sim)
 // otherwise just the named sheet
 // if setMsg = true then we output a message for each param that was set.
-func (ss *Sim) UpdateParams(sheet string, setMsg bool) error {
+func (ss *Sim) SetParams(sheet string, setMsg bool) error {
 	if sheet == "" {
 		// this is important for catching typos and ensuring that all sheets can be used
 		ss.Params.ValidateSheets([]string{"Network", "Sim"})
 	}
-	err := ss.UpdateParamsSet("Base", sheet, setMsg)
+	err := ss.SetParamsSet("Base", sheet, setMsg)
 	if ss.ParamSet != "" && ss.ParamSet != "Base" {
-		err = ss.UpdateParamsSet(ss.ParamSet, sheet, setMsg)
+		err = ss.SetParamsSet(ss.ParamSet, sheet, setMsg)
 	}
 	return err
 }
 
-// UpdateParamsSet sets the params for given params.Set name.
+// SetParamsSet sets the params for given params.Set name.
 // If sheet is empty, then it applies all avail sheets (e.g., Network, Sim)
 // otherwise just the named sheet
 // if setMsg = true then we output a message for each param that was set.
-func (ss *Sim) UpdateParamsSet(setNm string, sheet string, setMsg bool) error {
+func (ss *Sim) SetParamsSet(setNm string, sheet string, setMsg bool) error {
 	pset, err := ss.Params.SetByNameTry(setNm)
 	if err != nil {
 		return err
@@ -1390,7 +1269,6 @@ func (ss *Sim) UpdateParamsSet(setNm string, sheet string, setMsg bool) error {
 
 /*
 Following function configures a data table to fit the structure of the network.
-
 func (ss *Sim) ConfigPats() {
 	dt := ss.Pats
 	dt.SetMetaData("name", "TrainPats")
@@ -1405,7 +1283,6 @@ func (ss *Sim) ConfigPats() {
 		{"MotiveBias", etensor.FLOAT32, []int{1, 7}, []string{"Y", "X"}},
 		{"VTA_DA", etensor.FLOAT32, []int{1, 1}, []string{"Y", "X"}},
 	}, 25)
-
 	patgen.PermutedBinaryRows(dt.Cols[1], 1, 1, 0)
 	patgen.PermutedBinaryRows(dt.Cols[2], 1, 1, 0)
 	patgen.PermutedBinaryRows(dt.Cols[3], 1, 1, 0)
@@ -1413,10 +1290,9 @@ func (ss *Sim) ConfigPats() {
 	patgen.PermutedBinaryRows(dt.Cols[5], 1, 1, 0)
 	patgen.PermutedBinaryRows(dt.Cols[6], 1, 1, 0)
 	patgen.PermutedBinaryRows(dt.Cols[7], 1, 1, 0)
-
+	
 	dt.SaveCSV("PersonalityTraining.tsv", etable.Tab, etable.Headers)
 }
-
 */
 
 func (ss *Sim) OpenPats() {
@@ -1424,17 +1300,17 @@ func (ss *Sim) OpenPats() {
 	// ss.OpenPatAsset(ss.Hard, "hard.tsv", "Hard", "Hard Training patterns")
 	ss.Pvlv.OpenCSV("pvlv.tsv", etable.Tab) // Pavlovian training data
 	// ss.OpenPatAsset(ss.Impossible, "impossible.tsv", "Impossible", "Impossible Training patterns")
-	ss.Trn.OpenCSV("InstrThenPvlv.tsv", etable.Tab) // Order of training and number of epochs for each,
+	ss.Trn.OpenCSV("InstrThenPvlv.tsv", etable.Tab) // Order of training and number of epochs for each, 
 	// Pavlov first or Instrumental first. Should eventually create menu to choose.
 	//
-	ss.World.OpenCSV("World.tsv", etable.Tab) // Current state of the World
+	ss.World.OpenCSV("World.tsv", etable.Tab) // Current state of the World	
 	// ss.WorldChanges.OpenCSV("WorldChanges.tsv", etable.Tab) // Exogenous changes in State of the World
-
+	
 	// Currently the program is set up so that when first read in, the first row of World represents the initial state of the world
-	// and subsequent rows represent changes in the World.
+	// and subsequent rows represent changes in the World.  
 	// When the network starts behaving, it will modify each row of the network after the first one
 	// so that it takes into account all changes in both External and Internal state that will be input
-	// to the network.
+	// to the network.  
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -1596,6 +1472,7 @@ func (ss *Sim) LogTstTrl(dt *etable.Table) {
 	av := ss.Net.LayerByName("Avoid").(leabra.LeabraLayer).AsLeabra()
 	beh := ss.Net.LayerByName("Behavior").(leabra.LeabraLayer).AsLeabra()
 
+
 	trl := ss.TestEnv.Trial.Cur
 	row := trl
 
@@ -1621,7 +1498,7 @@ func (ss *Sim) LogTstTrl(dt *etable.Table) {
 	appt := ss.ValsTsr("Approach")
 	avt := ss.ValsTsr("Avoid")
 	beht := ss.ValsTsr("Behavior")
-
+	
 	enviro.UnitValsTensor(envt, "Act")
 	dt.SetCellTensor("EnviroAct", row, envt)
 	intero.UnitValsTensor(intt, "Act")
@@ -1630,10 +1507,10 @@ func (ss *Sim) LogTstTrl(dt *etable.Table) {
 	dt.SetCellTensor("AppAct", row, appt)
 	av.UnitValsTensor(avt, "Act")
 	dt.SetCellTensor("AvAct", row, avt)
-
+	
 	beh.UnitValsTensor(beht, "ActM")
 	dt.SetCellTensor("BehActM", row, beht)
-
+	
 	beh.UnitValsTensor(beht, "ActP")
 	dt.SetCellTensor("BehActP", row, beht)
 
@@ -1918,12 +1795,14 @@ func (ss *Sim) ConfigNetView(nv *netview.NetView) {
 	nv.ViewDefaults()
 	nv.Scene().Camera.Pose.Pos.Set(0.1, 1.5, 4)
 	nv.Scene().Camera.LookAt(mat32.Vec3{0.1, 0.1, 0}, mat32.Vec3{0, 1, 0})
-
-	labs := []string{"Frnd Desk Food Mate Bed SocSit Dngr", "IAff IAch IHngr ISex ISlp ISanx Fear", "WAff WAch WFood WSex WSlp", " WAvRej WAvHrm", "Hngt Stdy Eat Sex Sleep AvSoc Lve SHngt SStdy SEat SSlp SSex"}
-
+	
+	
+	
+		labs := []string{"Frnd Desk Food Mate Bed SocSit Dngr", "IAff IAch IHngr ISex ISlp ISanx Fear", "WAff WAch WFood WSex WSlp", " WAvRej WAvHrm", "Hngt Stdy Eat Sex Sleep AvSoc Lve SHngt SStdy SEat SSlp SSex"}
+		
 	nv.ConfigLabels(labs)
 
-	lays := []string{"Environment", "InteroState", "Approach", "Avoid", "Behavior"}
+	lays := []string{"Environment", "InteroState", "Approach", "Avoid","Behavior"}
 
 	for li, lnm := range lays {
 		ly := nv.LayerByName(lnm)
@@ -1934,6 +1813,11 @@ func (ss *Sim) ConfigNetView(nv *netview.NetView) {
 		lbl.Pose.Scale.SetMul(mat32.Vec3{.4, .08, 0.4})
 	}
 }
+
+
+
+
+
 
 // ConfigGui configures the GoGi gui interface for this simulation,
 func (ss *Sim) ConfigGui() *gi.Window {
@@ -1975,6 +1859,7 @@ func (ss *Sim) ConfigGui() *gi.Window {
 	ss.NetView = nv
 	ss.ConfigNetView(nv) // add labels etc
 
+
 	nv.Scene().Camera.Pose.Pos.Set(0, 1, 2.75) // more "head on" than default which is more "top down"
 	nv.Scene().Camera.LookAt(mat32.Vec3{0, 0, 0}, mat32.Vec3{0, 1, 0})
 
@@ -1995,28 +1880,14 @@ func (ss *Sim) ConfigGui() *gi.Window {
 
 	split.SetSplits(.3, .7)
 
-	// ANDY ADDITION
-	tbar.AddAction(gi.ActOpts{Label: "Dynamics", Icon: "run", Tooltip: "This runs the dynamics function one-time",
-		UpdateFunc: func(act *gi.Action) {
-			act.SetActiveStateUpdt(!ss.IsRunning)
-		}}, win.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-		if !ss.IsRunning {
-			ss.IsRunning = true
-			tbar.UpdateActions()
-			// single run
-			
-			
-			//go ss.Dynamics(true)
-			ss.Stop()
-		}
-	})
-
 	tbar.AddAction(gi.ActOpts{Label: "Init", Icon: "update", Tooltip: "Initialize everything including network weights, and start over.  Also applies current params.", UpdateFunc: func(act *gi.Action) {
 		act.SetActiveStateUpdt(!ss.IsRunning)
 	}}, win.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 		ss.Init()
 		vp.SetNeedsFullRender()
 	})
+
+
 
 	tbar.AddAction(gi.ActOpts{Label: "TrainPIT", Icon: "run", Tooltip: "This runs the Pavlovian and Instrumental training in the sequence and number of Epochs defined by a file that is read in.",
 		UpdateFunc: func(act *gi.Action) {
@@ -2029,6 +1900,7 @@ func (ss *Sim) ConfigGui() *gi.Window {
 			go ss.TrainPIT()
 		}
 	})
+
 
 	tbar.AddAction(gi.ActOpts{Label: "Train", Icon: "run", Tooltip: "Starts the network training, picking up from wherever it may have left off.  If not stopped, training will complete the specified number of Runs through the full number of Epochs of training, with testing automatically occuring at the specified interval.",
 		UpdateFunc: func(act *gi.Action) {
@@ -2244,7 +2116,7 @@ func (ss *Sim) CmdArgs() {
 	flag.StringVar(&ss.Tag, "tag", "", "extra tag to add to file names saved from this run")
 	flag.StringVar(&note, "note", "", "user note -- describe the run params etc")
 	flag.IntVar(&ss.MaxRuns, "runs", 10, "number of runs to do (note that MaxEpcs is in paramset)")
-	flag.BoolVar(&ss.LogUpdateParams, "UpdateParams", false, "if true, print a record of each parameter that is set")
+	flag.BoolVar(&ss.LogSetParams, "setparams", false, "if true, print a record of each parameter that is set")
 	flag.BoolVar(&ss.SaveWts, "wts", false, "if true, save final weights after each run")
 	flag.BoolVar(&saveEpcLog, "epclog", true, "if true, save train epoch log to file")
 	flag.BoolVar(&saveRunLog, "runlog", true, "if true, save run epoch log to file")
