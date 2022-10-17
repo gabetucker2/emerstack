@@ -334,22 +334,22 @@ func (ss *Sim) Config() {
 
 func(ss *Sim) ConfigWorldTsrs() {
 	if ss.EnvpTsr == nil {
-		ss.EnvpTsr = etensor.NewFloat32([]int{1,7},nil,nil)
+		ss.EnvpTsr = etensor.NewFloat32([]int{1, Parameters.Size},nil,nil)
 	}
 	if ss.EnvcTsr == nil {
-		ss.EnvcTsr = etensor.NewFloat32([]int{1,7},nil,nil)
+		ss.EnvcTsr = etensor.NewFloat32([]int{1, Parameters.Size},nil,nil)
 	}
 	if ss.IntpTsr == nil {
-		ss.IntpTsr = etensor.NewFloat32([]int{1,7},nil,nil)	
+		ss.IntpTsr = etensor.NewFloat32([]int{1, Parameters.Size},nil,nil)	
 	}
 	if ss.IntcTsr == nil {
-		ss.IntcTsr = etensor.NewFloat32([]int{1,7},nil,nil)	
+		ss.IntcTsr = etensor.NewFloat32([]int{1, Parameters.Size},nil,nil)	
 	}
 	if ss.EnviroTsr == nil {
-		ss.EnviroTsr = etensor.NewFloat32([]int{1,7},nil,nil)	
+		ss.EnviroTsr = etensor.NewFloat32([]int{1, Parameters.Size},nil,nil)	
 	}	
 	if ss.InteroTsr == nil {
-		ss.InteroTsr = etensor.NewFloat32([]int{1,7},nil,nil)	
+		ss.InteroTsr = etensor.NewFloat32([]int{1, Parameters.Size},nil,nil)	
 }
 }
 
@@ -390,8 +390,8 @@ func (ss *Sim) ConfigEnv() {
 
 func (ss *Sim) ConfigNet(net *leabra.Network) {
 	net.InitName(net, "Dynamic PersonalityModel")
-	enviro := net.AddLayer2D("Environment", 1, 7, emer.Input)
-	intero := net.AddLayer2D("InteroState", 1, 7, emer.Input)
+	enviro := net.AddLayer2D("Environment", 1, Parameters.Size, emer.Input)
+	intero := net.AddLayer2D("InteroState", 1, Parameters.Size, emer.Input)
 	
 	app := net.AddLayer2D("Approach", 1, 5, emer.Target)
 	av := net.AddLayer2D("Avoid", 1, 2, emer.Target)
@@ -579,7 +579,7 @@ func (ss *Sim) ApplyInputs(en env.Env) {
 	ss.Net.InitExt() // clear any existing inputs -- not strictly necessary if always
 	// going to the same layers, but good practice and cheap anyway
 
-	lays := []string{"Environment", "InteroState", "Approach", "Avoid","Behavior", "VTA_DA", "MotiveBias"}
+	lays := []string{"Environment", "InteroState", "Approach", "Avoid", "Behavior", "VTA_DA", "MotiveBias"}
 	for _, lnm := range lays {
 		ly := ss.Net.LayerByName(lnm).(leabra.LeabraLayer).AsLeabra()
 		pats := en.State(ly.Nm)
