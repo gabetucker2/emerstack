@@ -44,7 +44,8 @@ import (
 
 func main() {
 
-	SetupParams()
+	SetupDataStructures()
+
 	TheSim.New()
 	TheSim.Config()
 	if len(os.Args) > 1 {
@@ -902,41 +903,7 @@ type Parameter struct {
 	activeX   float64
 }
 
-//TODO: insert values below into these params, create function to automate increment
-
 var paramsStack, envStack, inpStack *Stack
-
-func SetupParams() { // initialize section by separating array to make it easier to manage
-
-	paramsStack = MakeStack(map[string]Parameter{
-
-		//env
-		"friend":          {true, -1, -1},
-		"desk":            {true, -1, -1},
-		"food":            {true, -1, -1},
-		"mate":            {true, -1, -1},
-		"bed":             {true, -1, -1},
-		"socialsituation": {true, -1, -1},
-		"danger":          {true, -1, -1},
-	
-		//inp
-		"affiliation":   {false, 0.02, -0.167},
-		"achievement":   {false, 0.0208, -0.083},
-		"hunger":        {false, 0.014, -0.143},
-		"sex":           {false, 0.0012, -0.333},
-		"sleep":         {false, 0.005, -0.0104},
-		"socialanxiety": {false, -1, -1}, // contingent on env - update later
-		"fear":          {false, -1, -1}, // contingent on env - update later
-		
-	})
-	envStack = paramsStack.GetMany(FIND_Lambda, func(card *Card) bool {
-		return card.Val.(Parameter).envNotInp
-	})
-	inpStack = paramsStack.GetMany(FIND_Lambda, func(card *Card) bool {
-		return !card.Val.(Parameter).envNotInp
-	})
-
-}
 
 func Tsr_GetParam(tsr *etensor.Float32, paramName string) (ret float64) {
 
@@ -964,7 +931,7 @@ func Param_Env_TimeEvolve(past *etensor.Float32, change *etensor.Float32, paramN
 
 func Param_Inp_TimeEvolve(bh *etensor.Float32, paramName string) (ret float64) {
 
-	param := paramsStack.Get(FIND_Key, paramName).Val
+	param := paramsStack.Get(FIND_Key, paramName).Val.(*Parameter)
 	ret = 1 - Tsr_GetParam(bh, paramName)*param.dx + bh.FloatVal1D(0)*param.activeX
 
 	return
@@ -981,7 +948,7 @@ func Param_AvoidDanger(bh *etensor.Float32) (ret float64) {
 
 func Param_Activate(bh *etensor.Float32, paramName string) (ret float64) {
 
-	ret = Tsr_GetParam(bh, paramName) * paramsStack.Get(FIND_Key, paramName).Val.activeX
+	ret = Tsr_GetParam(bh, paramName) * paramsStack.Get(FIND_Key, paramName).Val.(*Parameter).activeX
 
 	return
 
@@ -997,7 +964,7 @@ func ClampParamVal(val float64) (ret float64) {
 
 func SetParam(tsr *etensor.Float32, paramName string, newVal float64) {
 	
-	tsr.SetFloat1D(paramStack.GetMany(FIND_Lambda, func(card *Card) bool {
+	tsr.SetFloat1D(paramsStack.GetMany(FIND_Lambda, func(card *Card) bool {
 		return card.Val.(Parameter).envNotInp
 	}).Get(FIND_Key, paramName).Idx, newVal)
 
@@ -1100,16 +1067,18 @@ func (ss *Sim) Dynamics(returnOnChg bool) { // TODO: FIX DYNAMICS... this should
 
 		// ENVIRONMENT UPDATES; CALCULATE NEW STATE AND WRITE TO enviro TENSOR
 
-		for _, workingParamName := range envStack.GetMany(FIND_ALL, nil, RETURN_Keys) {
-			SetParam(
-				enviro,
-				workingParamName,
-				ClampParamVal(
-					Param_Env_TimeEvolve(envp, envc, workingParamName)+
-						Param_AvoidDanger(bh),
-				),
-			)
-		}
+		// TODO: update this segment
+		// envStack.GetMany(FIND_All, nil, RETURN_Keys).Lambda(func(card *Card, _ ...any) {
+		// 	workingParamName := card.Val.(string)
+		// 	SetParam(
+		// 		enviro,
+		// 		workingParamName,
+		// 		ClampParamVal(
+		// 			Param_Env_TimeEvolve(envp, envc, workingParamName)+
+		// 				Param_AvoidDanger(bh),
+		// 		),
+		// 	)
+		// })
 
 		// PREVIOUS VERSION WHERE EACH PARAMETER UPDATE IS NOT NECESSARILY THE SAME (LIKE DR. READ'S ORIGINAL):
 
