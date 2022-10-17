@@ -9,6 +9,7 @@ import (
 // * initialize variables
 var Parameters *Stack
 var ComplexActions *Stack
+var currentParameterIdx *int
 
 // * define enums
 type MinOrMax int
@@ -96,6 +97,51 @@ func MakeAction(requirements []*Requirement, updates []*Update, cost float32) *A
 	return newAction
 }
 
+// * define additional helper functions
+func IncrementCurrentParameterIdx(idx *int) int {
+	newInt := *idx + 1
+	*idx = newInt
+	return *idx
+}
+
+func PerformActions(actions *Stack, defaultParameterName string) {
+	
+	for _, _action := range actions.ToArray() {
+		
+		action := _action.(*Action)
+
+		// TODO: find a way to incorporate additional conditional into whether to perform action
+		if true {
+
+			// check if requirements are fulfilled
+			condition := true
+			for _, requirement := range action.Requirements {
+				if requirement.Parameter == "" {
+					requirement.Parameter = defaultParameterName
+				}
+				x := Parameters.Get(FIND_Key, requirement.Parameter).Val.(*Stack).Get(FIND_Key, requirement.Layer).Val.(*float32)
+				switch requirement.MinOrMax {
+				case Min:
+					condition = condition && *x >= requirement.Threshold
+				case Max:
+					condition = condition && *x <= requirement.Threshold
+				}
+			}
+
+			// requirements have been fulfilled
+			if condition {
+				// perform updates
+				for _, update := range action.Updates {
+					*Parameters.Get(FIND_Key, update.Parameter).Val.(*Stack).Get(FIND_Key, update.Layer).Val.(*float32) -= update.Dx
+				}
+				
+			}
+
+		}
+	}
+	
+}
+
 // * define timeIncrement functions
 func AsymptoteZero(x, dt, dx float32) float32 { // TODO: work on this more later
 	return dt * (x - (dx*x))
@@ -103,6 +149,8 @@ func AsymptoteZero(x, dt, dx float32) float32 { // TODO: work on this more later
 
 // * main structure setup
 func SetupDataStructures() {
+
+	*currentParameterIdx = 0
 	
 	// initialize our Parameters variable
 	Parameters = MakeStack(
@@ -117,7 +165,7 @@ func SetupDataStructures() {
 			MakeStack(
 
 				// property keys
-				[]string {"layers", "dt", "dx", "timeIncrement", "relations", "actions"},
+				[]string {"layerValues", "dt", "dx", "timeIncrements", "relations", "actions"},
 
 				// property vals
 				[]any {
@@ -125,17 +173,22 @@ func SetupDataStructures() {
 					// layers
 					MakeStack(
 						[]string {"enviro", "intero"}, // layer names
-						[]*float32 {&enviro.Values[0], &intero.Values[0]}, // layer addresses
+						[]*float32 {&enviro.Values[*currentParameterIdx], &intero.Values[IncrementCurrentParameterIdx(currentParameterIdx)]}, // layer addresses
+						// (what's going on here is we need to procedurally update our currentParameterIdx value so that we don't need to type in [0], [1], etc every time)
+						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
 					// dt (in seconds)
 					1,
 
-					// dx (assuming dt)
+					// dx
 					-0.167,
 
-					// timeIncrement (assuming dt)
-					AsymptoteZero,
+					// timeIncrements
+					MakeStack(
+						[]string {"enviro", "intero"},
+						[]func(float32, float32, float32) float32 {AsymptoteZero, AsymptoteZero},
+					),
 
 					// relations (assuming dt) (assuming change in this => how much do others change?)
 					MakeStack(

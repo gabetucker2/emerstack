@@ -389,7 +389,7 @@ func (ss *Sim) ConfigEnv() {
 }
 
 func (ss *Sim) ConfigNet(net *leabra.Network) {
-	net.InitName(net, "Dynamic PersonalityModel")
+	net.InitName(net, "Dynamic Personality Model")
 	enviro := net.AddLayer2D("Environment", 1, Parameters.Size, emer.Input)
 	intero := net.AddLayer2D("InteroState", 1, Parameters.Size, emer.Input)
 	
@@ -1036,88 +1036,141 @@ _, _, _, bidx := bh.Range()
 bh.SetZeros()
 bh.SetFloat1D(bidx, 1.0)
 
-// All of these values are based on lab discussion and "logic". Not based on research.  Would be nice to get research
-// decrements in food available (Environment) with each relevant behavior. Here probably just applies to Eat
-eat_food_decr := -0.143 
+// ! emergentstack:
 
-// decrements in Interoceptive states with each relevant behavior
-// 
-hngt_aff_decr := -0.167 
-// hngt_sa_decr := -0.1 
-stdy_ach_decr := -0.083 
-eat_hngr_decr := -0.143 
+// * Update Parameters
+for _, card := range Parameters.Cards {
 
-sex_decr := -0.333 
-slp_decr := -0.0104 
+	// initialize variables
+	parameterName := card.Key.(string)
+	parameterData := card.Val.(*Stack)
+	
+	layerValues := parameterData.Get(FIND_Key, "layerValues").Val.(*Stack)
+	initialLayerValues := MakeStack()
 
-// these are the increment per time step for each of the Interostates
-aff_incr := 0.02 
-ach_incr := 0.0208 
-hngr_incr := 0.014 
-sex_incr := 0.0012 
-slp_incr := 0.005 
+	dt := parameterData.Get(FIND_Key, "dt").Val.(float32)
+	dx := parameterData.Get(FIND_Key, "dx").Val.(float32)
+	timeIncrements := parameterData.Get(FIND_Key, "timeIncrements").Val.(*Stack)
 
-// ENVIRONMENT UPDATES; CALCULATE NEW STATE AND WRITE TO enviro TENSOR
+	actions := parameterData.Get(FIND_Key, "actions").Val.(*Stack)
+	relations := parameterData.Get(FIND_Key, "relations").Val.(*Stack)
 
-// Friend
-frnd := mat32.Clamp(float32((envp.FloatVal1D(0) + envc.FloatVal1D(0) + bh.FloatVal1D(6) * (-1))), 0, 1)
-enviro.SetFloat1D(0, float64(frnd))
+	// update time increments
+	for _, layerName := range layerValues.ToArray(RETURN_Keys) {
 
-// Desk
-desk := mat32.Clamp(float32((envp.FloatVal1D(1) + envc.FloatVal1D(1) + bh.FloatVal1D(6) * (-1))), 0, 1)
-enviro.SetFloat1D(1, float64(desk))
+		x := layerValues.Get(FIND_Key, layerName).Val.(*float32)
+		initialLayerValues.Add(layerName, gogenerics.CloneObject(*x)) // keep a save of the original layerValues so you can detect how much they've changed by then end of increments and actions
 
-// Food
-food := mat32.Clamp(float32((envp.FloatVal1D(2) + envc.FloatVal1D(2) + bh.FloatVal1D(2) * eat_food_decr)), 0, 1)
-enviro.SetFloat1D(2,	float64(food))
+		thisTimeIncrement := timeIncrements.Get(FIND_Key, layerName).Val.(func(float32, float32, float32) float32)
 
-//Mate
-mate := mat32.Clamp(float32((envp.FloatVal1D(3) + envc.FloatVal1D(3) + bh.FloatVal1D(6) * (-1))), 0, 1)
-enviro.SetFloat1D(3, float64(mate))
+		// update x/thisLayerValue to new float32
+		*x = thisTimeIncrement(*x, dt, dx)
 
-// Bed
-bed := mat32.Clamp(float32((envp.FloatVal1D(4) + envc.FloatVal1D(4) + bh.FloatVal1D(6) * (-1))), 0, 1)
-enviro.SetFloat1D(4, float64(bed))
+		// TODO: add cost stuff here
 
-// Social Situation
-socsit := mat32.Clamp(float32((envp.FloatVal1D(5) + envc.FloatVal1D(5) + bh.FloatVal1D(5) * (-1))), 0, 1)
-enviro.SetFloat1D(5, float64(socsit))
+	}
 
-// Danger
-dngr := mat32.Clamp(float32((envp.FloatVal1D(6) + envc.FloatVal1D(6) + bh.FloatVal1D(6) * (-1))), 0, 1)
-enviro.SetFloat1D(6, float64(dngr))
+	// perform actions
+	PerformActions(actions, parameterName)
+	
+	// update relations
+	for _, _relation := range relations.ToArray() {
+
+		relation := _relation.(*Relation)
+		deltaX := *initialLayerValues.Get(FIND_Key, relation.ThisLayer).Val.(*float32) - *layerValues.Get(FIND_Key, relation.ThisLayer).Val.(*float32)
+
+		// multiply the other parameter's value by the rate of change for the other parameter times the amount by which this parameter changed
+		*Parameters.Get(FIND_Key, relation.OtherParameter).Val.(*Stack).Get(FIND_Key, relation.OtherLayer).Val.(*float32) += (relation.Dx * deltaX)
+
+	}
+
+}
+
+// * Perform ComplexActions
+PerformActions(ComplexActions, "")
+
+// // All of these values are based on lab discussion and "logic". Not based on research.  Would be nice to get research
+// // decrements in food available (Environment) with each relevant behavior. Here probably just applies to Eat
+// eat_food_decr := -0.143 
+
+// // decrements in Interoceptive states with each relevant behavior
+// // 
+// hngt_aff_decr := -0.167 
+// // hngt_sa_decr := -0.1 
+// stdy_ach_decr := -0.083 
+// eat_hngr_decr := -0.143 
+
+// sex_decr := -0.333 
+// slp_decr := -0.0104 
+
+// // these are the increment per time step for each of the Interostates
+// aff_incr := 0.02 
+// ach_incr := 0.0208 
+// hngr_incr := 0.014 
+// sex_incr := 0.0012 
+// slp_incr := 0.005 
+
+// // ENVIRONMENT UPDATES; CALCULATE NEW STATE AND WRITE TO enviro TENSOR
+
+// // Friend
+// frnd := mat32.Clamp(float32((envp.FloatVal1D(0) + envc.FloatVal1D(0) + bh.FloatVal1D(6) * (-1))), 0, 1)
+// enviro.SetFloat1D(0, float64(frnd))
+
+// // Desk
+// desk := mat32.Clamp(float32((envp.FloatVal1D(1) + envc.FloatVal1D(1) + bh.FloatVal1D(6) * (-1))), 0, 1)
+// enviro.SetFloat1D(1, float64(desk))
+
+// // Food
+// food := mat32.Clamp(float32((envp.FloatVal1D(2) + envc.FloatVal1D(2) + bh.FloatVal1D(2) * eat_food_decr)), 0, 1)
+// enviro.SetFloat1D(2,	float64(food))
+
+// //Mate
+// mate := mat32.Clamp(float32((envp.FloatVal1D(3) + envc.FloatVal1D(3) + bh.FloatVal1D(6) * (-1))), 0, 1)
+// enviro.SetFloat1D(3, float64(mate))
+
+// // Bed
+// bed := mat32.Clamp(float32((envp.FloatVal1D(4) + envc.FloatVal1D(4) + bh.FloatVal1D(6) * (-1))), 0, 1)
+// enviro.SetFloat1D(4, float64(bed))
+
+// // Social Situation
+// socsit := mat32.Clamp(float32((envp.FloatVal1D(5) + envc.FloatVal1D(5) + bh.FloatVal1D(5) * (-1))), 0, 1)
+// enviro.SetFloat1D(5, float64(socsit))
+
+// // Danger
+// dngr := mat32.Clamp(float32((envp.FloatVal1D(6) + envc.FloatVal1D(6) + bh.FloatVal1D(6) * (-1))), 0, 1)
+// enviro.SetFloat1D(6, float64(dngr))
 
 
-// INTEROSTATE UPDATES: CALCULATE NEW STATE AND WRITE TO intero TENSOR
-// Clamp restricts result to range of 0 to 1.
+// // INTEROSTATE UPDATES: CALCULATE NEW STATE AND WRITE TO intero TENSOR
+// // Clamp restricts result to range of 0 to 1.
 
-// Affiliation
-aff := mat32.Clamp(float32((intp.FloatVal1D(0) + (1-bh.FloatVal1D(0) * aff_incr + bh.FloatVal1D(0)*hngt_aff_decr))), 0, 1)
-intero.SetFloat1D(0, float64(aff))
+// // Affiliation
+// aff := mat32.Clamp(float32((intp.FloatVal1D(0) + (1-bh.FloatVal1D(0) * aff_incr + bh.FloatVal1D(0)*hngt_aff_decr))), 0, 1)
+// intero.SetFloat1D(0, float64(aff))
 
-// Achievement
-ach := mat32.Clamp(float32((intp.FloatVal1D(1) + (1-bh.FloatVal1D(1) * ach_incr + bh.FloatVal1D(1)*stdy_ach_decr))), 0, 1)
-intero.SetFloat1D(1, float64(ach))
+// // Achievement
+// ach := mat32.Clamp(float32((intp.FloatVal1D(1) + (1-bh.FloatVal1D(1) * ach_incr + bh.FloatVal1D(1)*stdy_ach_decr))), 0, 1)
+// intero.SetFloat1D(1, float64(ach))
 
-// Hunger
-hngr := mat32.Clamp(float32((intp.FloatVal1D(2) + (1-bh.FloatVal1D(2) * hngr_incr + bh.FloatVal1D(2)* eat_hngr_decr))), 0, 1)
-intero.SetFloat1D(2, float64(hngr))
+// // Hunger
+// hngr := mat32.Clamp(float32((intp.FloatVal1D(2) + (1-bh.FloatVal1D(2) * hngr_incr + bh.FloatVal1D(2)* eat_hngr_decr))), 0, 1)
+// intero.SetFloat1D(2, float64(hngr))
 
-// Sex
-sex := mat32.Clamp(float32((intp.FloatVal1D(3) + (1 - bh.FloatVal1D(3) * sex_incr + bh.FloatVal1D(3)* sex_decr))), 0, 1)
-intero.SetFloat1D(3, float64(sex))
+// // Sex
+// sex := mat32.Clamp(float32((intp.FloatVal1D(3) + (1 - bh.FloatVal1D(3) * sex_incr + bh.FloatVal1D(3)* sex_decr))), 0, 1)
+// intero.SetFloat1D(3, float64(sex))
 
-// Sleep
-slp := mat32.Clamp(float32((intp.FloatVal1D(4) + (1 - bh.FloatVal1D(4) * slp_incr + bh.FloatVal1D(4)* slp_decr))), 0, 1)
-intero.SetFloat1D(4, float64(slp))
+// // Sleep
+// slp := mat32.Clamp(float32((intp.FloatVal1D(4) + (1 - bh.FloatVal1D(4) * slp_incr + bh.FloatVal1D(4)* slp_decr))), 0, 1)
+// intero.SetFloat1D(4, float64(slp))
 
-// Social Anxiety
-sanx := enviro.FloatVal1D(5)
-intero.SetFloat1D(5, sanx)
+// // Social Anxiety
+// sanx := enviro.FloatVal1D(5)
+// intero.SetFloat1D(5, sanx)
 
-// Fear
-fear := enviro.FloatVal1D(6)
-intero.SetFloat1D(6, fear)
+// // Fear
+// fear := enviro.FloatVal1D(6)
+// intero.SetFloat1D(6, fear)
 
 
 // write new Environment and InteroStates into World data table
