@@ -1009,15 +1009,15 @@ func (ss *Sim) Dynamics(returnOnChg bool) {
 // take envp, intp, and beh and then with the following, calculate new World State
 // 		en := &ss.TestEnv  // already assigned in "if statement" 
 
-		envc := en.State("Environment").(*etensor.Float32) // exogenous Changes to current Environment
+		// envc := en.State("Environment").(*etensor.Float32) // exogenous Changes to current Environment
 		// intc := en.State("InteroState").(*etensor.Float32)	  // exogenous Changes to current InteroState
 				// Are there exogenous changes to Interostate?  maybe we don't need intc.  
 		
 //		envc := ss.EnvcTsr // current Environment
 //		intc := ss.IntcTsr	  // current InteroState
 		
-		envp := ss.EnvpTsr
-		intp := ss.IntpTsr
+		// envp := ss.EnvpTsr
+		// intp := ss.IntpTsr
 		
 		enviro = ss.EnviroTsr  // This is used to create new Environment representation
     	intero = ss.InteroTsr   // This is used to create new InteroState representation
