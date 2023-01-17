@@ -143,8 +143,11 @@ func PerformActions(actions *Stack, defaultParameterName string) {
 }
 
 // * define timeIncrement functions
-func AsymptoteZero(x, dt, dx float32) (y float32) { // TODO: work on this more later
-	return dt * (x - (dx*x))
+func TimeIncrement(x, dx float32) (y float32) {
+	y = x + dx
+	if y < 0 {y = 0}
+	if y > 1 {y = 1}
+	return
 }
 
 // * main structure setup
@@ -190,7 +193,7 @@ func SetupDataStructures() {
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32) float32 {AsymptoteZero, AsymptoteZero},
+						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
 					// relations (assuming dt) (assuming change in this => how much do others change?)
@@ -282,7 +285,7 @@ func SetupDataStructures() {
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32) float32 {AsymptoteZero, AsymptoteZero},
+						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
 					// relations (assuming dt) (assuming change in this => how much do others change?)
@@ -355,7 +358,7 @@ func SetupDataStructures() {
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32) float32 {AsymptoteZero, AsymptoteZero},
+						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
 					// relations (assuming dt) (assuming change in this => how much do others change?)
@@ -425,7 +428,7 @@ func SetupDataStructures() {
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32) float32 {AsymptoteZero, AsymptoteZero},
+						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
 					// relations (assuming dt) (assuming change in this => how much do others change?)
@@ -495,7 +498,7 @@ func SetupDataStructures() {
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32) float32 {AsymptoteZero, AsymptoteZero},
+						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
 					// relations (assuming dt) (assuming change in this => how much do others change?)
@@ -565,7 +568,7 @@ func SetupDataStructures() {
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32) float32 {AsymptoteZero, AsymptoteZero},
+						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
 					// relations (assuming dt) (assuming change in this => how much do others change?)
@@ -635,7 +638,7 @@ func SetupDataStructures() {
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32) float32 {AsymptoteZero, AsymptoteZero},
+						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
 					// relations (assuming dt) (assuming change in this => how much do others change?)
