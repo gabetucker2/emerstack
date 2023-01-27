@@ -3,11 +3,10 @@ package main
 
 import (
 	. "github.com/gabetucker2/gostack"
-
 )
 
 // * main structure setup
-func SetupDataStructures() {
+func SetupModel() {
 
 	*currentParameterIdx = 0
 	

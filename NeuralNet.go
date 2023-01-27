@@ -16,14 +16,14 @@ import (
 	"os"
 	"strconv"
 	"time"
-	
+
 	"github.com/emer/emergent/emer"
 	"github.com/emer/emergent/env"
 	"github.com/emer/emergent/netview"
 	"github.com/emer/emergent/params"
 	"github.com/gabetucker2/gogenerics"
 	. "github.com/gabetucker2/gostack"
-	
+
 	// "github.com/emer/emergent/patgen"
 	"github.com/emer/emergent/prjn"
 	"github.com/emer/emergent/relpos"
@@ -44,7 +44,7 @@ import (
 
 func main() {
 	gogenerics.RemoveUnusedError(MakeCard()) // TODO: remove after setting up shop
-	SetupDataStructures()
+	SetupModel()
 	TheSim.New()
 	TheSim.Config()
 	if len(os.Args) > 1 {
