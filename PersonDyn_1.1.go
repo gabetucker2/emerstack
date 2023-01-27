@@ -1189,8 +1189,8 @@ PerformActions(ComplexActions, "")
 	
 // Apply new Environment and InteroState to network
 		
-		ss.ApplyInputs(&ss.TestEnv)
-		ss.AlphaCyc(false)   // !train
+	ss.ApplyInputs(&ss.TestEnv)
+	ss.AlphaCyc(false)   // !train
 	
 // Code to read Behavior activations after AlphaCyc applied
 
@@ -1205,7 +1205,6 @@ PerformActions(ComplexActions, "")
 
 	ss.TrialStats(false) // !accumulate
 	ss.LogTstTrl(ss.TstTrlLog)
-
 
 	}
 }
