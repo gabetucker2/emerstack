@@ -8,7 +8,21 @@ import (
 // * main structure setup
 func SetupModel() {
 
+	////////////////////////////////////////////////////////////////////
+	// DO NOT EDIT
+	//  logistical
 	*currentParameterIdx = 0
+	propertyKeys := []string {"layerValues", "b_ui", "dx_ui", "timeIncrements", "relations", "actions"}
+	//  default vals
+	tprev_s = 0
+	tcur_s = 0
+	////////////////////////////////////////////////////////////////////
+	// UNITS
+	// s  := seconds
+	// ui := unit interval [0, 1]
+	////////////////////////////////////////////////////////////////////
+	// EDIT BELOW
+ 	dt_s = 1
 	
 	// initialize our Parameters variable
 	Parameters = MakeStack(
@@ -23,7 +37,7 @@ func SetupModel() {
 			MakeStack(
 
 				// property keys
-				[]string {"layerValues", "b", "dt", "dx", "timeIncrements", "relations", "actions"},
+				propertyKeys,
 
 				// property vals
 				[]any {
@@ -36,22 +50,19 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b
+					// b_ui
 					0.5,
 
-					// dt (in seconds)
-					1,
-
-					// dx
+					// dx_ui
 					-0.167,
 
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]func(float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
-					// relations (assuming dt) (assuming change in this => how much do others change?)
+					// relations (assuming dt_s) (assuming change in this => how much do others change?)
 					MakeStack(
 						[]string {
 							"Feel a sense of achievement when you are fulfilled from talking to others", // 1
@@ -115,7 +126,7 @@ func SetupModel() {
 			MakeStack(
 
 				// property keys
-				[]string {"layerValues", "b", "dt", "dx", "timeIncrements", "relations", "actions"},
+				propertyKeys,
 
 				// property vals
 				[]any {
@@ -128,22 +139,19 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b
+					// b_ui
 					0.7,
 
-					// dt (in seconds)
-					1,
-
-					// dx
+					// dx_ui
 					-0.125,
 
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
-					// relations (assuming dt) (assuming change in this => how much do others change?)
+					// relations (assuming dt_s) (assuming change in this => how much do others change?)
 					MakeStack(
 						[]string {
 							"Want to talk to others after making an achievement", // 1
@@ -188,7 +196,7 @@ func SetupModel() {
 			MakeStack(
 
 				// property keys
-				[]string {"layerValues", "b", "dt", "dx", "timeIncrements", "relations", "actions"},
+				propertyKeys,
 
 				// property vals
 				[]any {
@@ -201,22 +209,19 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b
+					// b_ui
 					0.4,
 
-					// dt (in seconds)
-					1,
-
-					// dx
+					// dx_ui
 					-0.083,
 
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
-					// relations (assuming dt) (assuming change in this => how much do others change?)
+					// relations (assuming dt_s) (assuming change in this => how much do others change?)
 					MakeStack(
 						[]string {
 							"Less inclined to talk to others while hungry", // 1
@@ -258,7 +263,7 @@ func SetupModel() {
 			MakeStack(
 
 				// property keys
-				[]string {"layerValues", "b", "dt", "dx", "timeIncrements", "relations", "actions"},
+				propertyKeys,
 
 				// property vals
 				[]any {
@@ -271,22 +276,19 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b
+					// b_ui
 					0.8,
 
-					// dt (in seconds)
-					1,
-
-					// dx
+					// dx_ui
 					-0.095,
 
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
-					// relations (assuming dt) (assuming change in this => how much do others change?)
+					// relations (assuming dt_s) (assuming change in this => how much do others change?)
 					MakeStack(
 						[]string {
 							"Less inclined to talk to others while fulfilled in a special way", // 1
@@ -328,7 +330,7 @@ func SetupModel() {
 			MakeStack(
 
 				// property keys
-				[]string {"layerValues", "b", "dt", "dx", "timeIncrements", "relations", "actions"},
+				propertyKeys,
 
 				// property vals
 				[]any {
@@ -341,22 +343,19 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b
+					// b_ui
 					0.9,
 
-					// dt (in seconds)
-					1,
-
-					// dx
+					// dx_ui
 					-0.14,
 
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
-					// relations (assuming dt) (assuming change in this => how much do others change?)
+					// relations (assuming dt_s) (assuming change in this => how much do others change?)
 					MakeStack(
 						[]string {
 							"Less inclined to talk to others while sleepy", // 1
@@ -398,7 +397,7 @@ func SetupModel() {
 			MakeStack(
 
 				// property keys
-				[]string {"layerValues", "b", "dt", "dx", "timeIncrements", "relations", "actions"},
+				propertyKeys,
 
 				// property vals
 				[]any {
@@ -411,22 +410,19 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b
+					// b_ui
 					0.5,
-
-					// dt (in seconds)
-					1,
-
-					// dx
+					
+					// dx_ui
 					0,
 
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
-					// relations (assuming dt) (assuming change in this => how much do others change?)
+					// relations (assuming dt_s) (assuming change in this => how much do others change?)
 					MakeStack(
 						[]string {
 							"Less inclined to talk to others while socially anxious", // 1
@@ -468,7 +464,7 @@ func SetupModel() {
 			MakeStack(
 
 				// property keys
-				[]string {"layerValues", "b", "dt", "dx", "timeIncrements", "relations", "actions"},
+				propertyKeys,
 
 				// property vals
 				[]any {
@@ -481,22 +477,19 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b
+					// b_ui
 					0.5,
 
-					// dt (in seconds)
-					1,
-
-					// dx
+					// dx_ui
 					0,
 
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
-					// relations (assuming dt) (assuming change in this => how much do others change?)
+					// relations (assuming dt_s) (assuming change in this => how much do others change?)
 					MakeStack(
 						[]string {
 						},
@@ -563,6 +556,9 @@ func SetupModel() {
 			),
 
 		},
+		
 	)
+	
+	////////////////////////////////////////////////////////////////////
 
 }

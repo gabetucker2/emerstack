@@ -10,6 +10,7 @@ import (
 var Parameters *Stack
 var ComplexActions *Stack
 var currentParameterIdx *int
+var tprev_s, tcur_s, dt_s int
 
 // * define enums
 type MinOrMax int
@@ -143,9 +144,14 @@ func PerformActions(actions *Stack, defaultParameterName string) {
 }
 
 // * define timeIncrement functions
-func TimeIncrement(x, dx float32) (y float32) {
-	y = x + dx
-	if y < 0 {y = 0}
-	if y > 1 {y = 1}
+func TimeIncrement(x_ui, dx_ui, tprev_s, tcur_s, dt_s float32) (xprime_ui float32) {
+	
+	// compute xprime
+	Δt_s  := tcur_s - tprev_s
+	Δx_ui := Δt_s * (dx_ui / dt_s)
+	xprime_ui = clampUI(x_ui + Δx_ui)
+	
+	// return
 	return
+	
 }

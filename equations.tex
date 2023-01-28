@@ -1,0 +1,24 @@
+\documentclass[12pt]{article}
+\usepackage{amssymb}
+\usepackage{mathtools}
+
+\usepackage{fancyhdr}
+\setlength{\headheight}{15.2pt}
+\pagestyle{fancy}
+
+\begin{document}
+
+	\lhead{ \fancyplain{}{EmergentStack function equations} }
+
+	\section*{TimeIncrement()}
+	
+	Assuming arguments $\{x, dx, tprev, tcur, dt\}\in\mathbb{R}$,\\
+	calculate $x'$—the number to which $x$ should be updated given time changes:\\
+	
+	$\Delta t = tcur - tprev$\\
+	
+	$\frac{dx}{dt} = \frac{\Delta x}{\Delta t}\Rightarrow\Delta x = \Delta t\frac{dx}{dt}$\\
+	
+	$x' = x + \Delta x$ \textit{ensuring $x'\in [0,1]$}\\
+	
+\end{document}
