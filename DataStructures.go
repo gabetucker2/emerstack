@@ -143,7 +143,7 @@ func PerformActions(actions *Stack, defaultParameterName string) {
 	
 }
 
-// * define timeIncrement functions
+// * default timeIncrement function
 func TimeIncrement(x_ui, dx_ui, tprev_s, tcur_s, dt_s float32) (xprime_ui float32) {
 	
 	// compute xprime

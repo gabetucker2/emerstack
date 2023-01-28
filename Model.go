@@ -7,12 +7,12 @@ import (
 
 // * main structure setup
 func SetupModel() {
-
+	
 	////////////////////////////////////////////////////////////////////
 	// DO NOT EDIT
 	//  logistical
 	*currentParameterIdx = 0
-	propertyKeys := []string {"layerValues", "b_ui", "dx_ui", "timeIncrements", "relations", "actions"}
+	propertyKeys := []string {"layerValues", "bs_ui", "dx_ui", "timeIncrements", "relations", "actions"}
 	//  default vals
 	tprev_s = 0
 	tcur_s = 0
@@ -22,26 +22,21 @@ func SetupModel() {
 	// ui := unit interval [0, 1]
 	////////////////////////////////////////////////////////////////////
 	// EDIT BELOW
- 	dt_s = 1
+	dt_s = 1
 	
 	// initialize our Parameters variable
 	Parameters = MakeStack(
-
-		// parameters keys
-		[]string {"affiliation", "achievement", "hunger", "sex", "sleep", "socialSituation", "danger"},
-
-		// parameters vals
-		[]*Stack {
-
-			// affiliation
-			MakeStack(
-
+	
+		map[string]*Stack {
+		
+			"affiliation" : MakeStack(
+				
 				// property keys
 				propertyKeys,
-
+				
 				// property vals
 				[]any {
-
+					
 					// layers
 					MakeStack(
 						[]string {"enviro", "intero"}, // layer names
@@ -50,8 +45,11 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b_ui
-					0.5,
+					// bs_ui
+					MakeStack(
+						[]string {"intero"}, // layers
+						[]float32 {0.5}, // corresponding values
+					),
 
 					// dx_ui
 					-0.167,
@@ -59,7 +57,7 @@ func SetupModel() {
 					// timeIncrements
 					MakeStack(
 						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
 					),
 
 					// relations (assuming dt_s) (assuming change in this => how much do others change?)
@@ -122,8 +120,7 @@ func SetupModel() {
 
 			),
 
-			// achievement
-			MakeStack(
+			"achievement" : MakeStack(
 
 				// property keys
 				propertyKeys,
@@ -139,7 +136,7 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b_ui
+					// bs_ui
 					0.7,
 
 					// dx_ui
@@ -192,8 +189,7 @@ func SetupModel() {
 
 			),
 
-			// hunger
-			MakeStack(
+			"hunger" : MakeStack(
 
 				// property keys
 				propertyKeys,
@@ -209,7 +205,7 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b_ui
+					// bs_ui
 					0.4,
 
 					// dx_ui
@@ -259,8 +255,7 @@ func SetupModel() {
 
 			),
 
-			// sex
-			MakeStack(
+			"sex" : MakeStack(
 
 				// property keys
 				propertyKeys,
@@ -276,7 +271,7 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b_ui
+					// bs_ui
 					0.8,
 
 					// dx_ui
@@ -326,8 +321,7 @@ func SetupModel() {
 
 			),
 
-			// sleep
-			MakeStack(
+			"sleep" : MakeStack(
 
 				// property keys
 				propertyKeys,
@@ -343,7 +337,7 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b_ui
+					// bs_ui
 					0.9,
 
 					// dx_ui
@@ -393,8 +387,7 @@ func SetupModel() {
 
 			),
 
-			// socialSituation
-			MakeStack(
+			"socialSituation" : MakeStack(
 
 				// property keys
 				propertyKeys,
@@ -410,7 +403,7 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b_ui
+					// bs_ui
 					0.5,
 					
 					// dx_ui
@@ -460,8 +453,7 @@ func SetupModel() {
 
 			),
 
-			// danger
-			MakeStack(
+			"danger" : MakeStack(
 
 				// property keys
 				propertyKeys,
@@ -477,7 +469,7 @@ func SetupModel() {
 						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
 					),
 
-					// b_ui
+					// bs_ui
 					0.5,
 
 					// dx_ui
