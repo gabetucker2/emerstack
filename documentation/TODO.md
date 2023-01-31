@@ -2,7 +2,7 @@
 
  <h2>Toward a first working implementation</h2>
  
- *In order from most-important to least-important.*
+ *In order from most important to least important.*
  
  * Find out how to define EnviroTsr and InteroTsr procedurally based on `Model.go` code
  * Have no "enviro" state updates (like in current Model implementation/diagram); define enviro state updates in Unity. For instance, upon eating food:
