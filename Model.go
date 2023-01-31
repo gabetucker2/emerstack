@@ -3,28 +3,24 @@ package main
 
 import (
 	. "github.com/gabetucker2/gostack"
+	"github.com/emer/etable/etensor"
 )
 
 // * main structure setup
 func SetupModel() {
 	
-	////////////////////////////////////////////////////////////////////
-	// DO NOT EDIT
-	//  logistical
-	*currentParameterIdx = 0
-	propertyKeys := []string {"layerValues", "bs_ui", "dx_ui", "timeIncrements", "relations", "actions"}
-	//  default vals
-	tprev_s = 0
-	tcur_s = 0
-	////////////////////////////////////////////////////////////////////
+	InitializeImmutables() // set up starting values for variables the client shouldn't need to worry about, like propertyKeys
+	
 	// UNITS
 	// s  := seconds
-	// ui := unit interval [0, 1]
+	// ui := arbitrary unit in unit interval: [0, 1]
 	////////////////////////////////////////////////////////////////////
 	// EDIT BELOW
-	dt_s = 1
 	
-	// initialize our Parameters variable
+	dt_s = 1
+	Layers = MakeStack([]string {"enviro", "intero"}, []*etensor.Float32 {enviro, intero})
+	
+	// initialize our Parameters stack
 	Parameters = MakeStack(
 	
 		map[string]*Stack {
@@ -36,14 +32,6 @@ func SetupModel() {
 				
 				// property vals
 				[]any {
-					
-					// layers
-					MakeStack(
-						[]string {"enviro", "intero"}, // layer names
-						[]*float32 {&enviro.Values[*currentParameterIdx], &intero.Values[IncrementCurrentParameterIdx(currentParameterIdx)]}, // layer addresses
-						// (what's going on here is we need to procedurally update our currentParameterIdx value so that we don't need to type in [0], [1], etc every time)
-						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
-					),
 
 					// bs_ui
 					MakeStack(
@@ -51,13 +39,16 @@ func SetupModel() {
 						[]float32 {0.5}, // corresponding values
 					),
 
-					// dx_ui
-					-0.167,
+					// dxs_ui
+					MakeStack(
+						[]string{"intero"}, // layers
+						[]float32 {-0.167}, // corresponding values
+					),
 
 					// timeIncrements
 					MakeStack(
-						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]string {"intero"}, // layers
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement},
 					),
 
 					// relations (assuming dt_s) (assuming change in this => how much do others change?)
@@ -94,8 +85,6 @@ func SetupModel() {
 									MakeSimpleUpdate("intero", 0.4), // fulfillment
 									MakeSimpleUpdate("enviro", -0.1), // friend leaves after
 								},
-								// cost to perform action
-								0.4,
 							),
 
 							// 2
@@ -109,8 +98,6 @@ func SetupModel() {
 								[]*Update {
 									MakeSimpleUpdate("intero", 0.4), // fulfillment
 								},
-								// cost to perform action
-								0.18,
 							),
 
 						},
@@ -128,24 +115,22 @@ func SetupModel() {
 				// property vals
 				[]any {
 
-					// layers
+					// bs_ui
 					MakeStack(
-						[]string {"enviro", "intero"}, // layer names
-						[]*float32 {&enviro.Values[*currentParameterIdx], &intero.Values[IncrementCurrentParameterIdx(currentParameterIdx)]}, // layer addresses
-						// (what's going on here is we need to procedurally update our currentParameterIdx value so that we don't need to type in [0], [1], etc every time)
-						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
+						[]string {"intero"}, // layers
+						[]float32 {0.7}, // corresponding values
 					),
 
-					// bs_ui
-					0.7,
-
-					// dx_ui
-					-0.125,
+					// dxs_ui
+					MakeStack(
+						[]string{"intero"}, // layers
+						[]float32 {-0.125}, // corresponding values
+					),
 
 					// timeIncrements
 					MakeStack(
-						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]string {"intero"}, // layers
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement},
 					),
 
 					// relations (assuming dt_s) (assuming change in this => how much do others change?)
@@ -178,8 +163,6 @@ func SetupModel() {
 									MakeSimpleUpdate("intero", 0.6), // fulfillment
 									MakeSimpleUpdate("enviro", -0.2), // can't reachieve right after
 								},
-								// cost to perform action
-								0.5,
 							),
 
 						},
@@ -197,24 +180,22 @@ func SetupModel() {
 				// property vals
 				[]any {
 
-					// layers
+					// bs_ui
 					MakeStack(
-						[]string {"enviro", "intero"}, // layer names
-						[]*float32 {&enviro.Values[*currentParameterIdx], &intero.Values[IncrementCurrentParameterIdx(currentParameterIdx)]}, // layer addresses
-						// (what's going on here is we need to procedurally update our currentParameterIdx value so that we don't need to type in [0], [1], etc every time)
-						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
+						[]string {"intero"}, // layers
+						[]float32 {0.4}, // corresponding values
 					),
 
-					// bs_ui
-					0.4,
-
-					// dx_ui
-					-0.083,
+					// dxs_ui
+					MakeStack(
+						[]string{"intero"}, // layers
+						[]float32 {-0.083}, // corresponding values
+					),
 
 					// timeIncrements
 					MakeStack(
-						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]string {"intero"}, // layers
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement},
 					),
 
 					// relations (assuming dt_s) (assuming change in this => how much do others change?)
@@ -244,8 +225,6 @@ func SetupModel() {
 								[]*Update {
 									MakeSimpleUpdate("intero", 0.2), // fulfillment
 								},
-								// cost to perform action
-								0.21,
 							),
 
 						},
@@ -263,24 +242,22 @@ func SetupModel() {
 				// property vals
 				[]any {
 
-					// layers
+					// bs_ui
 					MakeStack(
-						[]string {"enviro", "intero"}, // layer names
-						[]*float32 {&enviro.Values[*currentParameterIdx], &intero.Values[IncrementCurrentParameterIdx(currentParameterIdx)]}, // layer addresses
-						// (what's going on here is we need to procedurally update our currentParameterIdx value so that we don't need to type in [0], [1], etc every time)
-						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
+						[]string {"intero"}, // layers
+						[]float32 {0.8}, // corresponding values
 					),
 
-					// bs_ui
-					0.8,
-
-					// dx_ui
-					-0.095,
+					// dxs_ui
+					MakeStack(
+						[]string{"intero"}, // layers
+						[]float32 {-0.095}, // corresponding values
+					),
 
 					// timeIncrements
 					MakeStack(
-						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]string {"intero"}, // layers
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement},
 					),
 
 					// relations (assuming dt_s) (assuming change in this => how much do others change?)
@@ -310,8 +287,6 @@ func SetupModel() {
 								[]*Update {
 									MakeSimpleUpdate("intero", 0.23), // fulfillment
 								},
-								// cost to perform action
-								0.16,
 							),
 
 						},
@@ -329,24 +304,22 @@ func SetupModel() {
 				// property vals
 				[]any {
 
-					// layers
+					// bs_ui
 					MakeStack(
-						[]string {"enviro", "intero"}, // layer names
-						[]*float32 {&enviro.Values[*currentParameterIdx], &intero.Values[IncrementCurrentParameterIdx(currentParameterIdx)]}, // layer addresses
-						// (what's going on here is we need to procedurally update our currentParameterIdx value so that we don't need to type in [0], [1], etc every time)
-						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
+						[]string {"intero"}, // layers
+						[]float32 {0.9}, // corresponding values
 					),
 
-					// bs_ui
-					0.9,
-
-					// dx_ui
-					-0.14,
+					// dxs_ui
+					MakeStack(
+						[]string{"intero"}, // layers
+						[]float32 {-0.14}, // corresponding values
+					),
 
 					// timeIncrements
 					MakeStack(
-						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]string {"intero"}, // layers
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement},
 					),
 
 					// relations (assuming dt_s) (assuming change in this => how much do others change?)
@@ -376,8 +349,6 @@ func SetupModel() {
 								[]*Update {
 									MakeSimpleUpdate("intero", 0.4), // fulfillment
 								},
-								// cost to perform action
-								0.19,
 							),
 
 						},
@@ -395,24 +366,22 @@ func SetupModel() {
 				// property vals
 				[]any {
 
-					// layers
-					MakeStack(
-						[]string {"enviro", "intero"}, // layer names
-						[]*float32 {&enviro.Values[*currentParameterIdx], &intero.Values[IncrementCurrentParameterIdx(currentParameterIdx)]}, // layer addresses
-						// (what's going on here is we need to procedurally update our currentParameterIdx value so that we don't need to type in [0], [1], etc every time)
-						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
-					),
-
 					// bs_ui
-					0.5,
+					MakeStack(
+						[]string {"intero"}, // layers
+						[]float32 {0.5}, // corresponding values
+					),
 					
-					// dx_ui
-					0,
+					// dxs_ui
+					MakeStack(
+						[]string{"intero"}, // layers
+						[]float32 {0}, // corresponding values
+					),
 
 					// timeIncrements
 					MakeStack(
-						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]string {"intero"},
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement},
 					),
 
 					// relations (assuming dt_s) (assuming change in this => how much do others change?)
@@ -442,8 +411,6 @@ func SetupModel() {
 								[]*Update {
 									MakeSimpleUpdate("intero", -0.3), // fulfillment
 								},
-								// cost to perform action
-								0.18,
 							),
 
 						},
@@ -461,24 +428,22 @@ func SetupModel() {
 				// property vals
 				[]any {
 
-					// layers
+					// bs_ui
 					MakeStack(
-						[]string {"enviro", "intero"}, // layer names
-						[]*float32 {&enviro.Values[*currentParameterIdx], &intero.Values[IncrementCurrentParameterIdx(currentParameterIdx)]}, // layer addresses
-						// (what's going on here is we need to procedurally update our currentParameterIdx value so that we don't need to type in [0], [1], etc every time)
-						// (but we can't do so from inside a function call, so we sneakily do it by calling a function with a return value)
+						[]string {"intero"}, // layers
+						[]float32 {0.5}, // corresponding values
 					),
 
-					// bs_ui
-					0.5,
-
-					// dx_ui
-					0,
+					// dxs_ui
+					MakeStack(
+						[]string{"intero"}, // layers
+						[]float32 {0}, // corresponding values
+					),
 
 					// timeIncrements
 					MakeStack(
-						[]string {"enviro", "intero"},
-						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement, TimeIncrement},
+						[]string {"intero"}, // layers
+						[]func(float32, float32, float32, float32, float32) float32 {TimeIncrement},
 					),
 
 					// relations (assuming dt_s) (assuming change in this => how much do others change?)
@@ -506,8 +471,6 @@ func SetupModel() {
 								[]*Update {
 									MakeSimpleUpdate("intero", -0.4), // fulfillment
 								},
-								// cost to perform action
-								0.38,
 							),
 
 						},
@@ -542,8 +505,6 @@ func SetupModel() {
 					MakeUpdate("food", "intero", 0.5), // food satisfied
 					MakeUpdate("food", "enviro", -0.3), // food gone after
 				},
-				// cost to perform action
-				0.27,
 				
 			),
 
@@ -552,5 +513,8 @@ func SetupModel() {
 	)
 	
 	////////////////////////////////////////////////////////////////////
+	// STOP EDITING
+	
+	FinishInitializing()
 
 }

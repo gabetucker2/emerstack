@@ -3,14 +3,13 @@ package main
 
 import (
 	. "github.com/gabetucker2/gostack"
-
+	"github.com/emer/etable/etensor"
 )
 
 // * initialize variables
-var Parameters *Stack
-var ComplexActions *Stack
-var currentParameterIdx *int
+var Parameters, ComplexActions, Layers *Stack
 var tprev_s, tcur_s, dt_s int
+var propertyKeys []string
 
 // * define enums
 type MinOrMax int
@@ -43,7 +42,6 @@ type Update struct {
 type Action struct {
 	Requirements []*Requirement
 	Updates []*Update
-	Cost float32
 }
 
 // * define struct initializer functions
@@ -90,11 +88,10 @@ func MakeSimpleUpdate(layer string, dx float32) *Update {
 	return newUpdate
 }
 
-func MakeAction(requirements []*Requirement, updates []*Update, cost float32) *Action {
+func MakeAction(requirements []*Requirement, updates []*Update) *Action {
 	newAction := new(Action)
 	newAction.Requirements = requirements
 	newAction.Updates = updates
-	newAction.Cost = cost
 	return newAction
 }
 
@@ -153,5 +150,33 @@ func TimeIncrement(x_ui, dx_ui, tprev_s, tcur_s, dt_s float32) (xprime_ui float3
 	
 	// return
 	return
+	
+}
+
+// Initialize immutable values
+func InitializeImmutables() {
+	
+	//  logistical
+	propertyKeys = []string {"bs_ui", "dxs_ui", "timeIncrements", "relations", "actions"} // "layerValues" is added to the beginning retroactively
+	//  default vals
+	tprev_s = 0
+	tcur_s = 0
+	
+}
+
+// Finish initializing the model
+func FinishInitializing() {
+	
+	// add a "layerValues" reference to each parameter's corresponding tensor
+	for i, _paramStack := range Parameters.ToArray() {
+		paramStack := _paramStack.(*Stack)
+		layerVals := MakeStack()
+		for _, _layerVal := range Layers.ToArray() {
+			layerVal := _layerVal.(*etensor.Float32)
+			layerVals.Add(layerVal.Values[i])
+		}
+		insertStack := MakeStack(Layers.GetMany(nil, nil, RETURN_Keys), layerVals)
+		paramStack.Add(MakeCard("layerValues", insertStack), ORDER_Before, FIND_First)
+	}
 	
 }

@@ -43,8 +43,6 @@ import (
 )
 
 func main() {
-	gogenerics.RemoveUnusedError(MakeCard()) // TODO: remove after setting up shop
-	SetupModel()
 	TheSim.New()
 	TheSim.Config()
 	if len(os.Args) > 1 {
@@ -200,7 +198,7 @@ func main() {
 					// state information organized and available without having to pass everything around
 					// as arguments to methods, and provides the core GUI interface (note the view tags
 						// for the fields which provide hints to how things should be displayed).
-						type Sim struct {
+						type Sim struct { // TODO: Find out how, when initializing the struct, to procedurally insert our layers defined in Model.go
 							Net          *leabra.Network   `view:"no-inline" desc:"the network -- click to view / edit parameters for layers, prjns, etc"`
 							Instr        *etable.Table     `view:"no-inline" desc:"Training pattern for Instrumental Learning"`
 							Pvlv         *etable.Table     `view:"no-inline" desc:"Training pattern for Pavlovian Learning"`
@@ -874,7 +872,7 @@ func main() {
 										//
 										//
 										
-										var enviro, intero *etensor.Float32
+										var enviro, intero *etensor.Float32 // TODO: remove this line, emergentstack it, and stuff below
 										
 										func (ss *Sim) Dynamics(returnOnChg bool) {
 											ss.TestEnv.Step()
@@ -928,6 +926,9 @@ func main() {
 												ss.LogTstTrl(ss.TstTrlLog)
 												
 												} else {
+													
+													// ! emergentstack section:
+													
 													// take previous inputs (cur-1), retrieve current values(cur) and behavior activations (see below)
 													// calculate new state of Environment and InteroState and put in TestEnv Table
 													// do below 
@@ -937,16 +938,20 @@ func main() {
 													
 													// envc := en.State("Environment").(*etensor.Float32) // exogenous Changes to current Environment
 													// intc := en.State("InteroState").(*etensor.Float32)	  // exogenous Changes to current InteroState
-													// Are there exogenous changes to Interostate?  maybe we don't need intc.  
+													// Are there exogenous changes to Interostate?  maybe we don't need intc.
 													
-													//		envc := ss.EnvcTsr // current Environment
-													//		intc := ss.IntcTsr	  // current InteroState
-													
+													// TODO: discuss envp and intp tensors: do we need them if we're plotting to a csv each frame?
+													// TODO: discuss role of envc/intc vs EnviroTsr and InteroTsr
 													// envp := ss.EnvpTsr
 													// intp := ss.IntpTsr
 													
+													// TODO: replace this with layerTensors; see EnviroTsr initialization to-do comment
 													enviro = ss.EnviroTsr  // This is used to create new Environment representation
 													intero = ss.InteroTsr   // This is used to create new InteroState representation
+													
+													layerTensors := MakeStack(Layers.ToArray(RETURN_Keys), []*etensor.Float32{enviro, intero}) // * dummy stack until you can figure out how to procedurally add EnviroTsr and InteroTsr
+													
+													SetupModel() // TODO: reorder setup model contingent on how you decide to deal with layerTensors (current implementation doesn't work sicne Layers isn't initialized yet)
 													
 													// Then calculate new enviro and new intero which will be written to the World datatable
 													// This code takes the tensor from the Behavior layer and then finds the index of the most strongly activated behavior.
@@ -960,8 +965,6 @@ func main() {
 													bh.SetZeros()
 													bh.SetFloat1D(bidx, 1.0)
 													
-													// ! emergentstack section:
-													
 													// * Update Parameters
 													for _, card := range Parameters.Cards {
 														
@@ -969,28 +972,29 @@ func main() {
 														parameterName := card.Key.(string)
 														parameterData := card.Val.(*Stack)
 														
-														layerValues := parameterData.Get(FIND_Key, "layerValues").Val.(*Stack)
-														initialLayerValues := MakeStack()
+														layers := parameterData.Get(FIND_Key, "layerValues").Val.(*Stack)
+														initialLayers := MakeStack()
 														
-														dt := parameterData.Get(FIND_Key, "dt").Val.(float32)
-														dx := parameterData.Get(FIND_Key, "dx").Val.(float32)
-														timeIncrements := parameterData.Get(FIND_Key, "timeIncrements").Val.(*Stack)
+														dx_ui := parameterData.Get(FIND_Key, "dx_ui").Val.(float32)
+														tprev_s := parameterData.Get(FIND_Key, "tprev_s").Val.(float32)
+														tcur_s := parameterData.Get(FIND_Key, "tcur_s").Val.(float32)
+														dt_s := parameterData.Get(FIND_Key, "dt_s").Val.(float32)
+														
+														timeIncrements := parameterData.Get(FIND_Key, "timeIncrements").Val.(*Stack) // get a stack containing each timeincrement function, corresponding to the desired incremented layer
 														
 														actions := parameterData.Get(FIND_Key, "actions").Val.(*Stack)
 														relations := parameterData.Get(FIND_Key, "relations").Val.(*Stack)
 														
 														// update time increments
-														for _, layerName := range layerValues.ToArray(RETURN_Keys) {
+														for _, layerName := range layers.ToArray(RETURN_Keys) {
 															
-															x := layerValues.Get(FIND_Key, layerName).Val.(*float32)
-															initialLayerValues.Add(layerName, gogenerics.CloneObject(*x)) // keep a save of the original layerValues so you can detect how much they've changed by then end of increments and actions
+															x := layers.Get(FIND_Key, layerName).Val.(*float32)
+															initialLayers.Add(layerName, gogenerics.CloneObject(*x)) // keep a save of the original layers so you can detect how much they've changed by then end of increments and actions
 															
-															thisTimeIncrement := timeIncrements.Get(FIND_Key, layerName).Val.(func(float32, float32, float32) float32)
+															thisTimeIncrement := timeIncrements.Get(FIND_Key, layerName).Val.(func(float32, float32, float32, float32, float32) float32)
 															
 															// update x/thisLayerValue to new float32
-															*x = thisTimeIncrement(*x, dt, dx)
-															
-															// TODO: add cost stuff here
+															*x = thisTimeIncrement(*x, dx_ui, tprev_s, tcur_s, dt_s)
 															
 														}
 														
@@ -1001,9 +1005,10 @@ func main() {
 														for _, _relation := range relations.ToArray() {
 															
 															relation := _relation.(*Relation)
-															deltaX := *initialLayerValues.Get(FIND_Key, relation.ThisLayer).Val.(*float32) - *layerValues.Get(FIND_Key, relation.ThisLayer).Val.(*float32)
+															deltaX := *initialLayers.Get(FIND_Key, relation.ThisLayer).Val.(*float32) - *layers.Get(FIND_Key, relation.ThisLayer).Val.(*float32)
 															
 															// multiply the other parameter's value by the rate of change for the other parameter times the amount by which this parameter changed
+															// TODO: double-check math, write it out in LaTeX
 															*Parameters.Get(FIND_Key, relation.OtherParameter).Val.(*Stack).Get(FIND_Key, relation.OtherLayer).Val.(*float32) += (relation.Dx * deltaX)
 															
 														}
@@ -1013,99 +1018,17 @@ func main() {
 													// * Perform ComplexActions
 													PerformActions(ComplexActions, "")
 													
-													// // All of these values are based on lab discussion and "logic". Not based on research.  Would be nice to get research
-													// // decrements in food available (Environment) with each relevant behavior. Here probably just applies to Eat
-													// eat_food_decr := -0.143 
-													
-													// // decrements in Interoceptive states with each relevant behavior
-													// // 
-													// hngt_aff_decr := -0.167 
-													// // hngt_sa_decr := -0.1 
-													// stdy_ach_decr := -0.083 
-													// eat_hngr_decr := -0.143 
-													
-													// sex_decr := -0.333 
-													// slp_decr := -0.0104 
-													
-													// // these are the increment per time step for each of the Interostates
-													// aff_incr := 0.02 
-													// ach_incr := 0.0208 
-													// hngr_incr := 0.014 
-													// sex_incr := 0.0012 
-													// slp_incr := 0.005 
-													
-													// // ENVIRONMENT UPDATES; CALCULATE NEW STATE AND WRITE TO enviro TENSOR
-													
-													// // Friend
-													// frnd := mat32.Clamp(float32((envp.FloatVal1D(0) + envc.FloatVal1D(0) + bh.FloatVal1D(6) * (-1))), 0, 1)
-													// enviro.SetFloat1D(0, float64(frnd))
-													
-													// // Desk
-													// desk := mat32.Clamp(float32((envp.FloatVal1D(1) + envc.FloatVal1D(1) + bh.FloatVal1D(6) * (-1))), 0, 1)
-													// enviro.SetFloat1D(1, float64(desk))
-													
-													// // Food
-													// food := mat32.Clamp(float32((envp.FloatVal1D(2) + envc.FloatVal1D(2) + bh.FloatVal1D(2) * eat_food_decr)), 0, 1)
-													// enviro.SetFloat1D(2,	float64(food))
-													
-													// //Mate
-													// mate := mat32.Clamp(float32((envp.FloatVal1D(3) + envc.FloatVal1D(3) + bh.FloatVal1D(6) * (-1))), 0, 1)
-													// enviro.SetFloat1D(3, float64(mate))
-													
-													// // Bed
-													// bed := mat32.Clamp(float32((envp.FloatVal1D(4) + envc.FloatVal1D(4) + bh.FloatVal1D(6) * (-1))), 0, 1)
-													// enviro.SetFloat1D(4, float64(bed))
-													
-													// // Social Situation
-													// socsit := mat32.Clamp(float32((envp.FloatVal1D(5) + envc.FloatVal1D(5) + bh.FloatVal1D(5) * (-1))), 0, 1)
-													// enviro.SetFloat1D(5, float64(socsit))
-													
-													// // Danger
-													// dngr := mat32.Clamp(float32((envp.FloatVal1D(6) + envc.FloatVal1D(6) + bh.FloatVal1D(6) * (-1))), 0, 1)
-													// enviro.SetFloat1D(6, float64(dngr))
-													// // INTEROSTATE UPDATES: CALCULATE NEW STATE AND WRITE TO intero TENSOR
-													// // Clamp restricts result to range of 0 to 1.
-													
-													// // Affiliation
-													// aff := mat32.Clamp(float32((intp.FloatVal1D(0) + (1-bh.FloatVal1D(0) * aff_incr + bh.FloatVal1D(0)*hngt_aff_decr))), 0, 1)
-													// intero.SetFloat1D(0, float64(aff))
-													
-													// // Achievement
-													// ach := mat32.Clamp(float32((intp.FloatVal1D(1) + (1-bh.FloatVal1D(1) * ach_incr + bh.FloatVal1D(1)*stdy_ach_decr))), 0, 1)
-													// intero.SetFloat1D(1, float64(ach))
-													
-													// // Hunger
-													// hngr := mat32.Clamp(float32((intp.FloatVal1D(2) + (1-bh.FloatVal1D(2) * hngr_incr + bh.FloatVal1D(2)* eat_hngr_decr))), 0, 1)
-													// intero.SetFloat1D(2, float64(hngr))
-													
-													// // Sex
-													// sex := mat32.Clamp(float32((intp.FloatVal1D(3) + (1 - bh.FloatVal1D(3) * sex_incr + bh.FloatVal1D(3)* sex_decr))), 0, 1)
-													// intero.SetFloat1D(3, float64(sex))
-													
-													// // Sleep
-													// slp := mat32.Clamp(float32((intp.FloatVal1D(4) + (1 - bh.FloatVal1D(4) * slp_incr + bh.FloatVal1D(4)* slp_decr))), 0, 1)
-													// intero.SetFloat1D(4, float64(slp))
-													
-													// // Social Anxiety
-													// sanx := enviro.FloatVal1D(5)
-													// intero.SetFloat1D(5, sanx)
-													
-													// // Fear
-													// fear := enviro.FloatVal1D(6)
-													// intero.SetFloat1D(6, fear)
-													// write new Environment and InteroStates into World data table
-													
-													////////////////////////////////////////////////////////////////////////////////////////
-													// NEED TO CHECK WHETHER I AM WRITING THE NEW ENVIRO AND INTERO VALUES INTO THE TABLE PROPERLY
-													////////////////////////////////////////////////////////////////////////////////////////
-													// dt will probably be something like &ss.TestEnv
-													
 													trl := ss.TestEnv.Trial.Cur
 													row := trl
-													dt := ss.World
 													
-													dt.SetCellTensor("Environment", row, enviro)
-													dt.SetCellTensor("InteroState", row, intero)
+													for _, tsrCard := range layerTensors.Cards {
+														
+														tsrName := tsrCard.Key.(string)
+														tsrVal := tsrCard.Val.(*etensor.Float32)
+														
+														ss.World.SetCellTensor(tsrName, row, tsrVal)
+														
+													}
 													
 													// Apply new Environment and InteroState to network
 													
@@ -1124,6 +1047,7 @@ func main() {
 													
 												}
 											}
+											// TODO: Implement this section if necessary for a first working version of the model?  Ask Dr. Read
 											/*
 											func (ss &Sim) UpdateWorld() {
 												// Code to read previous or t-1 Environment and InteroState values from Network
@@ -1224,6 +1148,7 @@ func main() {
 												return err
 											}
 											
+											// TODO: also discuss this section with Dr. Read
 											/*
 											Following function configures a data table to fit the structure of the network.
 											func (ss *Sim) ConfigPats() {
@@ -1423,6 +1348,7 @@ func main() {
 															// log always contains number of testing items
 															func (ss *Sim) LogTstTrl(dt *etable.Table) {
 																epc := ss.TrainEnv.Epoch.Prv // this is triggered by increment so use previous value
+																// TODO: proceduralize this section.  shouldn't be too hard.
 																enviro := ss.Net.LayerByName("Environment").(leabra.LeabraLayer).AsLeabra()
 																intero := ss.Net.LayerByName("InteroState").(leabra.LeabraLayer).AsLeabra()
 																app := ss.Net.LayerByName("Approach").(leabra.LeabraLayer).AsLeabra()
@@ -1474,6 +1400,7 @@ func main() {
 															}
 															
 															func (ss *Sim) ConfigTstTrlLog(dt *etable.Table) {
+																// TODO: proceduralize this section.  shouldn't be too hard.
 																enviro := ss.Net.LayerByName("Environment").(leabra.LeabraLayer).AsLeabra()
 																intero := ss.Net.LayerByName("InteroState").(leabra.LeabraLayer).AsLeabra()
 																app := ss.Net.LayerByName("Approach").(leabra.LeabraLayer).AsLeabra()
@@ -1564,6 +1491,7 @@ func main() {
 																	})
 																	ss.TstErrLog = trlix.NewTable()
 																	
+																	// TODO: proceduralize this section.  shouldn't be too hard.
 																	allsp := split.All(trlix)
 																	split.Agg(allsp, "SSE", agg.AggSum)
 																	split.Agg(allsp, "AvgSSE", agg.AggMean)
@@ -1747,6 +1675,8 @@ func main() {
 																		// ADDING UNIT LABELS TO NETVIEW
 																		
 																		func (ss *Sim) ConfigNetView(nv *netview.NetView) {
+																			// TODO: proceduralize this section.  shouldn't be too hard.  discuss considerations with dr. read if necessary.
+																			
 																			nv.ViewDefaults()
 																			nv.Scene().Camera.Pose.Pos.Set(0.1, 1.5, 4)
 																			nv.Scene().Camera.LookAt(mat32.Vec3{0.1, 0.1, 0}, mat32.Vec3{0, 1, 0})
