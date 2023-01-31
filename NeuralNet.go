@@ -911,6 +911,8 @@ func main() {
 												//		ss.ValsTsr("Envp") = en.State("Environment") // previous Environment
 												//		ss.ValsTsr("Intp") = en.State("InteroState")	  // previous InteroState
 												
+												// TODO: proceduralize this section.  shouldn't be too hard once you finish figuring out how you are going to order the layer arrays.
+												
 												ss.EnvpTsr = en.State("Environment").(*etensor.Float32) // previous Environment
 												ss.IntpTsr = en.State("InteroState").(*etensor.Float32)	  // previous InteroState
 												
@@ -927,7 +929,7 @@ func main() {
 												
 												} else {
 													
-													// ! emergentstack section:
+													// ! main emergentstack section:
 													
 													// take previous inputs (cur-1), retrieve current values(cur) and behavior activations (see below)
 													// calculate new state of Environment and InteroState and put in TestEnv Table
