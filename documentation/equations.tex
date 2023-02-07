@@ -12,8 +12,7 @@
 
 	\section*{TimeIncrement()}
 	
-	Assuming arguments $\{x, dx, tprev, tcur, dt\}\in\mathbb{R}$,\\
-	calculate $x'$—the number to which $x$ should be updated given time changes:\\
+	Assuming arguments $\{x, dx, tprev, tcur, dt\}\in\mathbb{R}$, calculate $x'$—the number to which $x$ should be updated given time changes:\\
 	
 	$\Delta t\coloneqq tcur - tprev$\\
 	
@@ -23,8 +22,8 @@
 
 	\section*{EnviroUnityToNN()}
 	
-	Assuming $a\coloneqq squash factor\in [0, 1]$:\\
+	Assuming a vertical stretch factor $a\in [0, 1]$, calculate d\textsubscript{NN}, the enviro tensor distance for a param, given d\textsubscript{unity}, the walking distance between the agent and the nearest stimulus of that param type in Unity:\\
 	
-	$d\textsubscript{NN}\coloneqq 1 - exp(-a d\textsubscript{unity})$\\
+	$d\textsubscript{NN}\coloneqq 1 - exp(-d\textsubscript{unity} \; a)$\\
 	
 \end{document}
