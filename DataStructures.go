@@ -1,5 +1,9 @@
 package main
 
+import (
+	. "github.com/gabetucker2/gostack"
+)
+
 func SetupDataStructures() {
 	
 	paramsStack = MakeStack(map[string]Parameter{
