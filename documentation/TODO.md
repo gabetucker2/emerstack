@@ -27,6 +27,7 @@
  * Made layer setup explicit
  * Removed "current" tensors
  * Defined EnviroTsr and InteroTsr procedurally based on `Model.go` code
+ * Created MathFunctions script, mathematiclaly modeled and implemented EnviroUnityToNN
 
  <h2>Future goals</h2>
  

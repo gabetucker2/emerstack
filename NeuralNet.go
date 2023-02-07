@@ -1732,6 +1732,19 @@ func main() {
 																			
 																			split.SetSplits(.3, .7)
 																			
+																			tbar.AddAction(gi.ActOpts{Label: "Dynamics", Icon: "run", Tooltip: "This runs the dynamics function one-time",
+																				UpdateFunc: func(act *gi.Action) {
+																					act.SetActiveStateUpdt(!ss.IsRunning)
+																				}}, win.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+																				if !ss.IsRunning {
+																					ss.IsRunning = true
+																					tbar.UpdateActions()
+																					// single run
+																					// TODO: integrate Dynamics call into every timestep
+																					go ss.Dynamics(true)
+																					ss.Stop()
+																				}
+																			})
 																			tbar.AddAction(gi.ActOpts{Label: "Init", Icon: "update", Tooltip: "Initialize everything including network weights, and start over.  Also applies current params.", UpdateFunc: func(act *gi.Action) {
 																				act.SetActiveStateUpdt(!ss.IsRunning)
 																				}}, win.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
