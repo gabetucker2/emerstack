@@ -4,7 +4,6 @@
  
  *In order from most important to least important.*
  
- * Model Unity and NN message enviro equation
  * Have no "enviro" state updates (like in current Model implementation/diagram); define enviro state updates in Unity. For instance, upon eating food:
    * Intero state is updated in neural net model
    * Enviro-global state is updated in Unity => Enviro-local state updated in the neural net model
@@ -15,6 +14,7 @@
  
  <h2>Completed</h2>
  
+ * Model Unity and NN message enviro equation 
  * Plan a schematic, git page, etc for the project
  * Refactored Model.go to use go map when defining parameters, rather than two arrays
  * Pluralized `b` and `dx` values
