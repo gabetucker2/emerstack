@@ -83,7 +83,6 @@ func SetupModel() {
 								// updates if the action is performed
 								[]*Update {
 									MakeSimpleUpdate("intero", 0.4), // fulfillment
-									MakeSimpleUpdate("enviro", -0.1), // friend leaves after
 								},
 							),
 							
@@ -161,7 +160,6 @@ func SetupModel() {
 								// updates if the action is performed
 								[]*Update {
 									MakeSimpleUpdate("intero", 0.6), // fulfillment
-									MakeSimpleUpdate("enviro", -0.2), // can't reachieve right after
 								},
 							),
 
@@ -501,9 +499,7 @@ func SetupModel() {
 				// updates if the action is performed
 				[]*Update {
 					MakeUpdate("affiliation", "intero", 0.3), // fulfillment
-					MakeUpdate("affiliation", "enviro", -0.07), // friend leaves after
 					MakeUpdate("food", "intero", 0.5), // food satisfied
-					MakeUpdate("food", "enviro", -0.3), // food gone after
 				},
 				
 			),
