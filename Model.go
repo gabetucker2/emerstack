@@ -485,13 +485,14 @@ func SetupModel() {
 
 	// create complex actions
 	ComplexActions = MakeStack(
-		[]string {
-			"Grab food with friend", // 1
-		},
-		[]*Action {
-
-			// 1
-			MakeAction(
+		map[string]*Action {
+			"Idle" : MakeAction(
+				// requirements for this action to be performed
+				[]*Requirement {},
+				// updates if the action is performed
+				[]*Update {},
+			),
+			"Grab food with friend" : MakeAction(
 				// requirements for this action to be performed
 				[]*Requirement {
 					MakeRequirement("affiliation", "intero", Max, 0.7), // must have social battery
@@ -504,12 +505,9 @@ func SetupModel() {
 					MakeUpdate("affiliation", "enviro", -0.07), // friend leaves after
 					MakeUpdate("food", "intero", 0.5), // food satisfied
 					MakeUpdate("food", "enviro", -0.3), // food gone after
-				},
-				
+				},	
 			),
-
 		},
-		
 	)
 	
 	////////////////////////////////////////////////////////////////////
