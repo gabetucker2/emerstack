@@ -4,10 +4,9 @@
  
  *In order from most important to least important.*
  
- * Remove all direct references of enviro and intero from `Model.go`; these should be called via some function that iterates over an array in which they're stored.
  * Finish replacing all mentions of layers, actions, etc with EmergentStack functions
- * Ensure the model is bug-free
  * Run the model, ensuring it produces realistic results
+ * Remove all direct references of enviro and intero from `Model.go`; these should be called via some function that iterates over an array in which they're stored.
  * Have system for mapping actions/complex actions in NN to deliberate actions in Unity (complex actions will likely raise some issues with our current system)
  * Implement method for easily switching on and off Requirements condition for updates
  * Run the model with Unity, ensuring it produces realistic results
@@ -17,6 +16,7 @@
  * Have no "enviro" state updates (like in current Model implementation/diagram); define enviro state updates in Unity. For instance, upon eating food:
    * Intero state is updated in neural net model
    * Enviro-global state is updated in Unity => Enviro-local state updated in the neural net model
+   * BUT have it so non-Unity implementation updates Enviro manually, whereas Unity implementation ignores Enviro manual updates
  * Model Unity and NN message enviro equation 
  * Plan a schematic, git page, etc for the project
  * Refactored Model.go to use go map when defining parameters, rather than two arrays

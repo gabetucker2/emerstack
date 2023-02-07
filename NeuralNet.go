@@ -388,6 +388,7 @@ func main() {
 								
 								// Commands that are used to position the layers in the Netview
 								
+								// TODO: proceduralize intero and enviro
 								app.SetRelPos(relpos.Rel{Rel: relpos.Above, Other: "Environment", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
 								hid.SetRelPos(relpos.Rel{Rel: relpos.Above, Other: "Approach", YAlign: relpos.Front, XAlign: relpos.Left, YOffset: 0})
 								beh.SetRelPos(relpos.Rel{Rel: relpos.Above, Other: "Hidden", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
@@ -1015,7 +1016,7 @@ func main() {
 													bh = ss.ValsTsr("Behavior") // see ra25 example for this method for a reusable map of tensors
 													beh.UnitValsTensor(bh, "ActM") // read the actMs into tensor
 													ss.tsrsStack.Update(REPLACE_Val, enviro.Clone(), FIND_Key, "enviroPrev")  // saves current environment  as previous Environment for next step
-													ss.tsrsStack.Update(REPLACE_Val, enviro.Clone(), FIND_Key, "interoPrev")	  // saves current InteroState as previous InteroState for next step
+													ss.tsrsStack.Update(REPLACE_Val, intero.Clone(), FIND_Key, "interoPrev")	  // saves current InteroState as previous InteroState for next step
 													ss.TrialStats(false) // !accumulate
 													ss.LogTstTrl(ss.TstTrlLog)
 													
@@ -1354,6 +1355,7 @@ func main() {
 																avt := ss.ValsTsr("Avoid")
 																beht := ss.ValsTsr("Behavior")
 																
+																// TODO: proceduralize this section
 																enviro.UnitValsTensor(envt, "Act")
 																dt.SetCellTensor("EnviroAct", row, envt)
 																intero.UnitValsTensor(intt, "Act")
@@ -1401,6 +1403,7 @@ func main() {
 																	sch = append(sch, etable.Column{lnm + " ActM.Avg", etensor.FLOAT64, nil, nil})
 																}
 																sch = append(sch, etable.Schema{
+																	// TODO: proceduralize this section, shouldn't be too hard
 																	{"EnviroAct", etensor.FLOAT64, enviro.Shp.Shp, nil},
 																	{"InteroAct", etensor.FLOAT64, intero.Shp.Shp, nil},
 																	{"AppActM", etensor.FLOAT64, app.Shp.Shp, nil},
