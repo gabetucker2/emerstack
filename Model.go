@@ -18,7 +18,7 @@ func SetupModel() {
 	// EDIT BELOW
 	
 	dt_s = 1
-	Layers = MakeStack([]string {"enviro", "intero"}, []*etensor.Float32 {enviro, intero})
+	Layers = MakeStack([]string {"enviro", "intero"}, make([]*etensor.Float32, 2))
 	
 	// initialize our Parameters stack
 	Parameters = MakeStack(
@@ -72,7 +72,7 @@ func SetupModel() {
 							"Call friend", // 2
 						},
 						[]*Action {
-
+							
 							// 1
 							MakeAction(
 								// requirements for this action to be performed
@@ -86,7 +86,7 @@ func SetupModel() {
 									MakeSimpleUpdate("enviro", -0.1), // friend leaves after
 								},
 							),
-
+							
 							// 2
 							MakeAction(
 								// requirements for this action to be performed
@@ -99,7 +99,7 @@ func SetupModel() {
 									MakeSimpleUpdate("intero", 0.4), // fulfillment
 								},
 							),
-
+							
 						},
 					),
 

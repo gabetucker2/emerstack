@@ -197,83 +197,78 @@ func main() {
 					// functionality as methods on this struct.  This structure keeps all relevant
 					// state information organized and available without having to pass everything around
 					// as arguments to methods, and provides the core GUI interface (note the view tags
-						// for the fields which provide hints to how things should be displayed).
-						type Sim struct { // TODO: Find out how, when initializing the struct, to procedurally insert our layers defined in Model.go
-							Net          *leabra.Network   `view:"no-inline" desc:"the network -- click to view / edit parameters for layers, prjns, etc"`
-							Instr        *etable.Table     `view:"no-inline" desc:"Training pattern for Instrumental Learning"`
-							Pvlv         *etable.Table     `view:"no-inline" desc:"Training pattern for Pavlovian Learning"`
-							Trn    		 *etable.Table     `view:"no-inline" desc:"Table that controls type of training and number of Epochs of training"`
-							Training	 string			   `view:"no-inline" desc:"Type of training: Pavlovian or Instrumental"`
-							World 	 	 *etable.Table     `view:"no-inline" desc:"Table that represents starting state and then each new state of the Internal and External world"`
-							// WorldChanges *etable.Table     `view:"no-inline" desc:"Table that represents change in External world at each time step"`
-							TrnEpcLog    *etable.Table     `view:"no-inline" desc:"training epoch-level log data"`
-							TstEpcLog    *etable.Table     `view:"no-inline" desc:"testing epoch-level log data"`
-							TstTrlLog    *etable.Table     `view:"no-inline" desc:"testing trial-level log data"`
-							TstErrLog    *etable.Table     `view:"no-inline" desc:"log of all test trials where errors were made"`
-							TstErrStats  *etable.Table     `view:"no-inline" desc:"stats on test trials where errors were made"`
-							TstCycLog    *etable.Table     `view:"no-inline" desc:"testing cycle-level log data"`
-							RunLog       *etable.Table     `view:"no-inline" desc:"summary log of each run"`
-							RunStats     *etable.Table     `view:"no-inline" desc:"aggregate stats on all runs"`
-							Params       params.Sets       `view:"no-inline" desc:"full collection of param sets"`
-							ParamSet     string            `desc:"which set of *additional* parameters to use -- always applies Base and optionaly this next if set"`
-							Tag          string            `desc:"extra tag string to add to any file names output from sim (e.g., weights files, log files, params for run)"`
-							MaxRuns      int               `desc:"maximum number of model runs to perform"`
-							MaxEpcs      int               `desc:"maximum number of epochs to run per model run"`
-							NZeroStop    int               `desc:"if a positive number, training will stop after this many epochs with zero SSE"`
-							TrainEnv     env.FixedTable    `desc:"Training environment -- contains everything about iterating over input / output patterns over training"`
-							TestEnv      env.FixedTable    `desc:"Testing environment -- manages iterating over testing"`
-							Time         leabra.Time       `desc:"leabra timing parameters and state"`
-							ViewOn       bool              `desc:"whether to update the network view while running"`
-							TrainUpdt    leabra.TimeScales `desc:"at what time scale to update the display during training?  Anything longer than Epoch updates at Epoch in this model"`
-							TestUpdt     leabra.TimeScales `desc:"at what time scale to update the display during testing?  Anything longer than Epoch updates at Epoch in this model"`
-							TestInterval int               `desc:"how often to run through all the test patterns, in terms of training epochs -- can use 0 or -1 for no testing"`
-							LayStatNms   []string          `desc:"names of layers to collect more detailed stats on (avg act, etc)"`
-							
-							// statistics: note use float64 as that is best for etable.Table
-							TrlErr        float64 `inactive:"+" desc:"1 if trial was error, 0 if correct -- based on SSE = 0 (subject to .5 unit-wise tolerance)"`
-							TrlSSE        float64 `inactive:"+" desc:"current trial's sum squared error"`
-							TrlAvgSSE     float64 `inactive:"+" desc:"current trial's average sum squared error"`
-							TrlCosDiff    float64 `inactive:"+" desc:"current trial's cosine difference"`
-							EpcSSE        float64 `inactive:"+" desc:"last epoch's total sum squared error"`
-							EpcAvgSSE     float64 `inactive:"+" desc:"last epoch's average sum squared error (average over trials, and over units within layer)"`
-							EpcPctErr     float64 `inactive:"+" desc:"last epoch's average TrlErr"`
-							EpcPctCor     float64 `inactive:"+" desc:"1 - last epoch's average TrlErr"`
-							EpcCosDiff    float64 `inactive:"+" desc:"last epoch's average cosine difference for output layer (a normalized error measure, maximum of 1 when the minus phase exactly matches the plus)"`
-							EpcPerTrlMSec float64 `inactive:"+" desc:"how long did the epoch take per trial in wall-clock milliseconds"`
-							FirstZero     int     `inactive:"+" desc:"epoch at when SSE first went to zero"`
-							NZero         int     `inactive:"+" desc:"number of epochs in a row with zero SSE"`
-							
-							// internal state - view:"-"
-							SumErr       float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
-							SumSSE       float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
-							SumAvgSSE    float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
-							SumCosDiff   float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
-							Win          *gi.Window                  `view:"-" desc:"main GUI window"`
-							NetView      *netview.NetView            `view:"-" desc:"the network viewer"`
-							ToolBar      *gi.ToolBar                 `view:"-" desc:"the master toolbar"`
-							TrnEpcPlot   *eplot.Plot2D               `view:"-" desc:"the training epoch plot"`
-							TstEpcPlot   *eplot.Plot2D               `view:"-" desc:"the testing epoch plot"`
-							TstTrlPlot   *eplot.Plot2D               `view:"-" desc:"the test-trial plot"`
-							TstCycPlot   *eplot.Plot2D               `view:"-" desc:"the test-cycle plot"`
-							RunPlot      *eplot.Plot2D               `view:"-" desc:"the run plot"`
-							TrnEpcFile   *os.File                    `view:"-" desc:"log file"`
-							RunFile      *os.File                    `view:"-" desc:"log file"`
-							ValsTsrs     map[string]*etensor.Float32 `view:"-" desc:"map tensor for holding layer values"`
-							EnvpTsr 	 *etensor.Float32 		     `view:"-" desc:"for holding previous Environment values"`
-							IntpTsr 	 *etensor.Float32 		     `view:"-" desc:"for holding previous InteroState values"`
-							EnvcTsr 	 *etensor.Float32 		     `view:"-" desc:"for holding current Environment values"`
-							IntcTsr 	 *etensor.Float32 		     `view:"-" desc:"for holding current InteroState values"`
-							EnviroTsr 	 *etensor.Float32 		     `view:"-" desc:"for holding New Environment values"`
-							InteroTsr 	 *etensor.Float32 		     `view:"-" desc:"for holding New InteroState values"`
-							SaveWts      bool                        `view:"-" desc:"for command-line run only, auto-save final weights after each run"`
-							NoGui        bool                        `view:"-" desc:"if true, runing in no GUI mode"`
-							LogSetParams bool                        `view:"-" desc:"if true, print message for all params that are set"`
-							IsRunning    bool                        `view:"-" desc:"true if sim is running"`
-							StopNow      bool                        `view:"-" desc:"flag to stop running"`
-							NeedsNewRun  bool                        `view:"-" desc:"flag to initialize NewRun if last one finished"`
-							RndSeed      int64                       `view:"-" desc:"the current random seed"`
-							LastEpcTime  time.Time                   `view:"-" desc:"timer for last epoch"`
-						}
+					// for the fields which provide hints to how things should be displayed).
+					type Sim struct {
+						Net          *leabra.Network   `view:"no-inline" desc:"the network -- click to view / edit parameters for layers, prjns, etc"`
+						Instr        *etable.Table     `view:"no-inline" desc:"Training pattern for Instrumental Learning"`
+						Pvlv         *etable.Table     `view:"no-inline" desc:"Training pattern for Pavlovian Learning"`
+						Trn    		 *etable.Table     `view:"no-inline" desc:"Table that controls type of training and number of Epochs of training"`
+						Training	 string			   `view:"no-inline" desc:"Type of training: Pavlovian or Instrumental"`
+						World 	 	 *etable.Table     `view:"no-inline" desc:"Table that represents starting state and then each new state of the Internal and External world"`
+						// WorldChanges *etable.Table     `view:"no-inline" desc:"Table that represents change in External world at each time step"`
+						TrnEpcLog    *etable.Table     `view:"no-inline" desc:"training epoch-level log data"`
+						TstEpcLog    *etable.Table     `view:"no-inline" desc:"testing epoch-level log data"`
+						TstTrlLog    *etable.Table     `view:"no-inline" desc:"testing trial-level log data"`
+						TstErrLog    *etable.Table     `view:"no-inline" desc:"log of all test trials where errors were made"`
+						TstErrStats  *etable.Table     `view:"no-inline" desc:"stats on test trials where errors were made"`
+						TstCycLog    *etable.Table     `view:"no-inline" desc:"testing cycle-level log data"`
+						RunLog       *etable.Table     `view:"no-inline" desc:"summary log of each run"`
+						RunStats     *etable.Table     `view:"no-inline" desc:"aggregate stats on all runs"`
+						Params       params.Sets       `view:"no-inline" desc:"full collection of param sets"`
+						ParamSet     string            `desc:"which set of *additional* parameters to use -- always applies Base and optionaly this next if set"`
+						Tag          string            `desc:"extra tag string to add to any file names output from sim (e.g., weights files, log files, params for run)"`
+						MaxRuns      int               `desc:"maximum number of model runs to perform"`
+						MaxEpcs      int               `desc:"maximum number of epochs to run per model run"`
+						NZeroStop    int               `desc:"if a positive number, training will stop after this many epochs with zero SSE"`
+						TrainEnv     env.FixedTable    `desc:"Training environment -- contains everything about iterating over input / output patterns over training"`
+						TestEnv      env.FixedTable    `desc:"Testing environment -- manages iterating over testing"`
+						Time         leabra.Time       `desc:"leabra timing parameters and state"`
+						ViewOn       bool              `desc:"whether to update the network view while running"`
+						TrainUpdt    leabra.TimeScales `desc:"at what time scale to update the display during training?  Anything longer than Epoch updates at Epoch in this model"`
+						TestUpdt     leabra.TimeScales `desc:"at what time scale to update the display during testing?  Anything longer than Epoch updates at Epoch in this model"`
+						TestInterval int               `desc:"how often to run through all the test patterns, in terms of training epochs -- can use 0 or -1 for no testing"`
+						LayStatNms   []string          `desc:"names of layers to collect more detailed stats on (avg act, etc)"`
+						
+						// statistics: note use float64 as that is best for etable.Table
+						TrlErr        float64 `inactive:"+" desc:"1 if trial was error, 0 if correct -- based on SSE = 0 (subject to .5 unit-wise tolerance)"`
+						TrlSSE        float64 `inactive:"+" desc:"current trial's sum squared error"`
+						TrlAvgSSE     float64 `inactive:"+" desc:"current trial's average sum squared error"`
+						TrlCosDiff    float64 `inactive:"+" desc:"current trial's cosine difference"`
+						EpcSSE        float64 `inactive:"+" desc:"last epoch's total sum squared error"`
+						EpcAvgSSE     float64 `inactive:"+" desc:"last epoch's average sum squared error (average over trials, and over units within layer)"`
+						EpcPctErr     float64 `inactive:"+" desc:"last epoch's average TrlErr"`
+						EpcPctCor     float64 `inactive:"+" desc:"1 - last epoch's average TrlErr"`
+						EpcCosDiff    float64 `inactive:"+" desc:"last epoch's average cosine difference for output layer (a normalized error measure, maximum of 1 when the minus phase exactly matches the plus)"`
+						EpcPerTrlMSec float64 `inactive:"+" desc:"how long did the epoch take per trial in wall-clock milliseconds"`
+						FirstZero     int     `inactive:"+" desc:"epoch at when SSE first went to zero"`
+						NZero         int     `inactive:"+" desc:"number of epochs in a row with zero SSE"`
+						
+						// internal state - view:"-"
+						SumErr       float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
+						SumSSE       float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
+						SumAvgSSE    float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
+						SumCosDiff   float64                     `view:"-" inactive:"+" desc:"sum to increment as we go through epoch"`
+						Win          *gi.Window                  `view:"-" desc:"main GUI window"`
+						NetView      *netview.NetView            `view:"-" desc:"the network viewer"`
+						ToolBar      *gi.ToolBar                 `view:"-" desc:"the master toolbar"`
+						TrnEpcPlot   *eplot.Plot2D               `view:"-" desc:"the training epoch plot"`
+						TstEpcPlot   *eplot.Plot2D               `view:"-" desc:"the testing epoch plot"`
+						TstTrlPlot   *eplot.Plot2D               `view:"-" desc:"the test-trial plot"`
+						TstCycPlot   *eplot.Plot2D               `view:"-" desc:"the test-cycle plot"`
+						RunPlot      *eplot.Plot2D               `view:"-" desc:"the run plot"`
+						TrnEpcFile   *os.File                    `view:"-" desc:"log file"`
+						RunFile      *os.File                    `view:"-" desc:"log file"`
+						ValsTsrs     map[string]*etensor.Float32 `view:"-" desc:"map tensor for holding layer values"`
+						tsrsStack    *Stack                      `view:"-" desc:"gostack map structure containing the keys and values for each stack"`
+						SaveWts      bool                        `view:"-" desc:"for command-line run only, auto-save final weights after each run"`
+						NoGui        bool                        `view:"-" desc:"if true, runing in no GUI mode"`
+						LogSetParams bool                        `view:"-" desc:"if true, print message for all params that are set"`
+						IsRunning    bool                        `view:"-" desc:"true if sim is running"`
+						StopNow      bool                        `view:"-" desc:"flag to stop running"`
+						NeedsNewRun  bool                        `view:"-" desc:"flag to initialize NewRun if last one finished"`
+						RndSeed      int64                       `view:"-" desc:"the current random seed"`
+						LastEpcTime  time.Time                   `view:"-" desc:"timer for last epoch"`
+					}
 						
 						// this registers this Sim Type and gives it properties that e.g.,
 						// prompt for filename for save methods.
@@ -319,30 +314,9 @@ func main() {
 							ss.ConfigTstTrlLog(ss.TstTrlLog)
 							ss.ConfigTstCycLog(ss.TstCycLog)
 							ss.ConfigRunLog(ss.RunLog)
-							ss.ConfigWorldTsrs()  // Needs to be added to Config program
 						}
 						// are all of these tensors used/needed??
-						
-						func(ss *Sim) ConfigWorldTsrs() {
-							if ss.EnvpTsr == nil {
-								ss.EnvpTsr = etensor.NewFloat32([]int{1, Parameters.Size},nil,nil)
-							}
-							if ss.EnvcTsr == nil {
-								ss.EnvcTsr = etensor.NewFloat32([]int{1, Parameters.Size},nil,nil)
-							}
-							if ss.IntpTsr == nil {
-								ss.IntpTsr = etensor.NewFloat32([]int{1, Parameters.Size},nil,nil)	
-							}
-							if ss.IntcTsr == nil {
-								ss.IntcTsr = etensor.NewFloat32([]int{1, Parameters.Size},nil,nil)	
-							}
-							if ss.EnviroTsr == nil {
-								ss.EnviroTsr = etensor.NewFloat32([]int{1, Parameters.Size},nil,nil)	
-								}	
-								if ss.InteroTsr == nil {
-									ss.InteroTsr = etensor.NewFloat32([]int{1, Parameters.Size},nil,nil)	
-								}
-							}
+
 							func (ss *Sim) ConfigEnv() {
 								if ss.MaxRuns == 0 { // allow user override
 									ss.MaxRuns = 10
@@ -872,8 +846,6 @@ func main() {
 										//
 										//
 										
-										var enviro, intero *etensor.Float32 // TODO: remove this line, emergentstack it, and stuff below
-										
 										func (ss *Sim) Dynamics(returnOnChg bool) {
 											ss.TestEnv.Step()
 											// TestTrial is called periodically during training, by default.  TestInterval is currently set to -1 to turn that off.
@@ -913,8 +885,8 @@ func main() {
 												
 												// TODO: proceduralize this section.  shouldn't be too hard once you finish figuring out how you are going to order the layer arrays.
 												
-												ss.EnvpTsr = en.State("Environment").(*etensor.Float32) // previous Environment
-												ss.IntpTsr = en.State("InteroState").(*etensor.Float32)	  // previous InteroState
+												ss.tsrsStack.Update(REPLACE_Val, en.State("Enviro").(*etensor.Float32), FIND_Key, "EnvpTsr") // previous Environment
+												ss.tsrsStack.Update(REPLACE_Val, en.State("Intero").(*etensor.Float32), FIND_Key, "IntpTsr") // previous Environment
 												
 												ss.ApplyInputs(&ss.TestEnv)
 												ss.AlphaCyc(false)   // !train
@@ -948,8 +920,8 @@ func main() {
 													// intp := ss.IntpTsr
 													
 													// TODO: replace this with layerTensors; see EnviroTsr initialization to-do comment
-													enviro = ss.EnviroTsr  // This is used to create new Environment representation
-													intero = ss.InteroTsr   // This is used to create new InteroState representation
+													enviro := ss.tsrsStack.Get(FIND_Key, "enviro").Val.(*etensor.Float32)  // This is used to create new Environment representation
+													intero := ss.tsrsStack.Get(FIND_Key, "intero").Val.(*etensor.Float32)   // This is used to create new InteroState representation
 													
 													layerTensors := MakeStack(Layers.ToArray(RETURN_Keys), []*etensor.Float32{enviro, intero}) // * dummy stack until you can figure out how to procedurally add EnviroTsr and InteroTsr
 													
@@ -959,13 +931,13 @@ func main() {
 													// This code takes the tensor from the Behavior layer and then finds the index of the most strongly activated behavior.
 													
 													bh := ss.ValsTsr("Behavior")
-													_, _, _, bidx := bh.Range()
+													_, _, _, maxBHIdx := bh.Range() // TODO: have behavior-generating minimum threshold, rather than just grab the max
 													
 													// then set the Behavior tensor to all zeros and then set the value at the index to 1.
 													// so this tensor identifies which behavior is Performed or Enacted
 													
 													bh.SetZeros()
-													bh.SetFloat1D(bidx, 1.0)
+													bh.SetFloat1D(maxBHIdx, 1.0) // selected behavior => 1, rest are set to 0, found from idx "maxBHIdx"
 													
 													// * Update Parameters
 													for _, card := range Parameters.Cards {
@@ -1010,7 +982,7 @@ func main() {
 															deltaX := *initialLayers.Get(FIND_Key, relation.ThisLayer).Val.(*float32) - *layers.Get(FIND_Key, relation.ThisLayer).Val.(*float32)
 															
 															// multiply the other parameter's value by the rate of change for the other parameter times the amount by which this parameter changed
-															// TODO: double-check math, write it out in LaTeX
+															// TODO: update math, write it out in LaTeX
 															*Parameters.Get(FIND_Key, relation.OtherParameter).Val.(*Stack).Get(FIND_Key, relation.OtherLayer).Val.(*float32) += (relation.Dx * deltaX)
 															
 														}
@@ -1042,8 +1014,8 @@ func main() {
 													beh := ss.Net.LayerByName("Behavior").(leabra.LeabraLayer).AsLeabra()
 													bh = ss.ValsTsr("Behavior") // see ra25 example for this method for a reusable map of tensors
 													beh.UnitValsTensor(bh, "ActM") // read the actMs into tensor
-													ss.EnvpTsr = enviro  // saves current environment  as previous Environment for next step
-													ss.IntpTsr = intero	  // saves current InteroState as previous InteroState for next step
+													ss.tsrsStack.Update(REPLACE_Val, enviro.Clone(), FIND_Key, "enviroPrev")  // saves current environment  as previous Environment for next step
+													ss.tsrsStack.Update(REPLACE_Val, enviro.Clone(), FIND_Key, "interoPrev")	  // saves current InteroState as previous InteroState for next step
 													ss.TrialStats(false) // !accumulate
 													ss.LogTstTrl(ss.TstTrlLog)
 													
@@ -1500,7 +1472,7 @@ func main() {
 																	split.Agg(allsp, "EnviroAct", agg.AggMean)
 																	split.Agg(allsp, "InteroAct", agg.AggMean)
 																	split.Agg(allsp, "BehActM", agg.AggMean)
-																	split.Agg(allsp, "BehActP", agg.AggMean)
+																	split.Agg(allsp, "BehActP", agg.AggMean)q
 																	
 																	ss.TstErrStats = allsp.AggsToTable(etable.AddAggName)
 																	

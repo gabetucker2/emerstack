@@ -109,6 +109,7 @@ func PerformActions(actions *Stack, defaultParameterName string) {
 		action := _action.(*Action)
 
 		// TODO: find a way to incorporate additional conditional into whether to perform action
+		// TODO: make update conditions more complex, add complexactions, add clampUI
 		if true {
 
 			// check if requirements are fulfilled
@@ -177,6 +178,13 @@ func FinishInitializing() {
 		}
 		insertStack := MakeStack(Layers.GetMany(nil, nil, RETURN_Keys), layerVals)
 		paramStack.Add(MakeCard("layerValues", insertStack), ORDER_Before, FIND_First)
+	}
+
+	// fill up the tsrsStack property in Sim
+	TheSim.tsrsStack = Layers.Clone()
+	for _, layer := range Layers.ToArray() {
+		var prevTsr *etensor.Float32
+		TheSim.tsrsStack.Add(MakeCard(layer.(string) + "Prev", prevTsr))
 	}
 	
 }

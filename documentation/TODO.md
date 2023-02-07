@@ -5,6 +5,7 @@
  *In order from most important to least important.*
  
  * Find out how to define EnviroTsr and InteroTsr procedurally based on `Model.go` code
+ * Model Unity and NN message enviro equation
  * Have no "enviro" state updates (like in current Model implementation/diagram); define enviro state updates in Unity. For instance, upon eating food:
    * Intero state is updated in neural net model
    * Enviro-global state is updated in Unity => Enviro-local state updated in the neural net model
@@ -22,6 +23,7 @@
  * Remove cost function from model.  Perhaps we just need the state updates to intrinsically act as the cost (e.g., going on a walk increases need for food and sleep).  The neural network model hidden layers will (ideally) take care of representing "cost".
  * Added units to all variable names
  * Made layer setup explicit
+ * Removed "current" tensors
  
  <h2>Future goals</h2>
  
