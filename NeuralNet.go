@@ -1472,7 +1472,7 @@ func main() {
 																	split.Agg(allsp, "EnviroAct", agg.AggMean)
 																	split.Agg(allsp, "InteroAct", agg.AggMean)
 																	split.Agg(allsp, "BehActM", agg.AggMean)
-																	split.Agg(allsp, "BehActP", agg.AggMean)q
+																	split.Agg(allsp, "BehActP", agg.AggMean)
 																	
 																	ss.TstErrStats = allsp.AggsToTable(etable.AddAggName)
 																	
