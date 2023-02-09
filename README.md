@@ -1,5 +1,7 @@
 <h1>EmergentStack/Dynamics</h1>
 
+<h2>emer v1.2.3</h2>
+
 Welcome!  This page is a work-in-progress.
 
 This is the current EmergentStack implementation for the Dynamics project.

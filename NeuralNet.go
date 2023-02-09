@@ -350,8 +350,8 @@ func main() {
 							
 							func (ss *Sim) ConfigNet(net *leabra.Network) {
 								net.InitName(net, "Dynamic Personality Model")
-								enviro := net.AddLayer2D("Environment", 1, Parameters.Size, emer.Input)
-								intero := net.AddLayer2D("InteroState", 1, Parameters.Size, emer.Input)
+								enviro := net.AddLayer2D("Environment", 1, 7, emer.Input)
+								intero := net.AddLayer2D("InteroState", 1, 7, emer.Input) // TODO: @@@@ fix Parameters.Size
 								
 								app := net.AddLayer2D("Approach", 1, 5, emer.Target)
 								av := net.AddLayer2D("Avoid", 1, 2, emer.Target)
@@ -1153,14 +1153,14 @@ func main() {
 												*/
 												
 												func (ss *Sim) OpenPats() {
-													ss.Instr.OpenCSV("instr.tsv", etable.Tab) // Instrumental training data
+													ss.Instr.OpenCSV("data/instr.tsv", etable.Tab) // Instrumental training data
 													// ss.OpenPatAsset(ss.Hard, "hard.tsv", "Hard", "Hard Training patterns")
-													ss.Pvlv.OpenCSV("pvlv.tsv", etable.Tab) // Pavlovian training data
+													ss.Pvlv.OpenCSV("data/pvlv.tsv", etable.Tab) // Pavlovian training data
 													// ss.OpenPatAsset(ss.Impossible, "impossible.tsv", "Impossible", "Impossible Training patterns")
-													ss.Trn.OpenCSV("InstrThenPvlv.tsv", etable.Tab) // Order of training and number of epochs for each, 
+													ss.Trn.OpenCSV("data/InstrThenPvlv.tsv", etable.Tab) // Order of training and number of epochs for each, 
 													// Pavlov first or Instrumental first. Should eventually create menu to choose.
 													//
-													ss.World.OpenCSV("World.tsv", etable.Tab) // Current state of the World	
+													ss.World.OpenCSV("data/World.tsv", etable.Tab) // Current state of the World	
 													// ss.WorldChanges.OpenCSV("WorldChanges.tsv", etable.Tab) // Exogenous changes in State of the World
 													
 													// Currently the program is set up so that when first read in, the first row of World represents the initial state of the world
