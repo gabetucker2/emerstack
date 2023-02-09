@@ -4,6 +4,7 @@
  
  *In order from most important to least important.*
  
+ * Fix line 354 @@@@ nn.go
  * Finish replacing all mentions of layers, actions, etc with EmergentStack functions
  * Run the model, ensuring it produces realistic results
  * Remove all direct references of enviro and intero from `Model.go`; these should be called via some function that iterates over an array in which they're stored.
@@ -28,6 +29,7 @@
  * Removed "current" tensors
  * Defined EnviroTsr and InteroTsr procedurally based on `Model.go` code
  * Created MathFunctions script, mathematiclaly modeled and implemented EnviroUnityToNN
+ * Migrate to leabra v1.2.3, build initial model!
 
  <h2>Future goals</h2>
  
