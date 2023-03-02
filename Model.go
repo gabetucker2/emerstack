@@ -2,7 +2,7 @@
 package main
 
 import (
-	. "github.com/gabetucker2/gostack"
+	. "github.com/gabetucker2/gostack"//lint:ignore ST1001 ignore warning
 	"github.com/emer/etable/etensor"
 )
 
@@ -15,7 +15,7 @@ func SetupModel() {
 	// s  := seconds
 	// ui := arbitrary unit in unit interval: [0, 1]
 	////////////////////////////////////////////////////////////////////
-	// EDIT BELOW
+	// EDIT BELOW:
 	
 	dt_s = 1
 	Layers = MakeStack([]string {"enviro", "intero"}, make([]*etensor.Float32, 2))

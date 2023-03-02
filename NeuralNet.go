@@ -43,6 +43,7 @@ import (
 )
 
 func main() {
+	SetupModel()
 	TheSim.New()
 	TheSim.Config()
 	if len(os.Args) > 1 {
@@ -350,8 +351,8 @@ func main() {
 							
 							func (ss *Sim) ConfigNet(net *leabra.Network) {
 								net.InitName(net, "Dynamic Personality Model")
-								enviro := net.AddLayer2D("Environment", 1, 7, emer.Input)
-								intero := net.AddLayer2D("InteroState", 1, 7, emer.Input) // TODO: @@@@ fix Parameters.Size
+								enviro := net.AddLayer2D("Environment", 1, Parameters.Size, emer.Input)
+								intero := net.AddLayer2D("InteroState", 1, Parameters.Size, emer.Input) // TODO: @@@@ fix Parameters.Size
 								
 								app := net.AddLayer2D("Approach", 1, 5, emer.Target)
 								av := net.AddLayer2D("Avoid", 1, 2, emer.Target)
@@ -926,8 +927,6 @@ func main() {
 													
 													layerTensors := MakeStack(Layers.ToArray(RETURN_Keys), []*etensor.Float32{enviro, intero}) // * dummy stack until you can figure out how to procedurally add EnviroTsr and InteroTsr
 													
-													SetupModel() // TODO: reorder setup model contingent on how you decide to deal with layerTensors (current implementation doesn't work sicne Layers isn't initialized yet)
-													
 													// Then calculate new enviro and new intero which will be written to the World datatable
 													// This code takes the tensor from the Behavior layer and then finds the index of the most strongly activated behavior.
 													
@@ -1323,7 +1322,7 @@ func main() {
 															// log always contains number of testing items
 															func (ss *Sim) LogTstTrl(dt *etable.Table) {
 																epc := ss.TrainEnv.Epoch.Prv // this is triggered by increment so use previous value
-																// TODO: proceduralize this section.  shouldn't be too hard.
+																// TODO: proceduralize this section.  Shouldn't be too hard.
 																enviro := ss.Net.LayerByName("Environment").(leabra.LeabraLayer).AsLeabra()
 																intero := ss.Net.LayerByName("InteroState").(leabra.LeabraLayer).AsLeabra()
 																app := ss.Net.LayerByName("Approach").(leabra.LeabraLayer).AsLeabra()
@@ -1661,7 +1660,7 @@ func main() {
 																			
 																			nv.ConfigLabels(labs)
 																			
-																			lays := []string{"Environment", "InteroState", "Approach", "Avoid","Behavior"}
+																			lays := []string{"Environment", "InteroState", "Approach", "Avoid", "Behavior"}
 																			
 																			for li, lnm := range lays {
 																				ly := nv.LayerByName(lnm)
@@ -1740,7 +1739,6 @@ func main() {
 																					ss.IsRunning = true
 																					tbar.UpdateActions()
 																					// single run
-																					// TODO: integrate Dynamics call into every timestep
 																					go ss.Dynamics(true)
 																					ss.Stop()
 																				}

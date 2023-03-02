@@ -2,8 +2,10 @@
 package main
 
 import (
-	. "github.com/gabetucker2/gostack"
+	"fmt"
+
 	"github.com/emer/etable/etensor"
+	. "github.com/gabetucker2/gostack"
 )
 
 // * initialize variables
@@ -156,10 +158,13 @@ func InitializeImmutables() {
 func FinishInitializing() {
 	
 	// add a "layerValues" reference to each parameter's corresponding tensor
-	for i, _paramStack := range Parameters.ToArray() {
-		paramStack := _paramStack.(*Stack)
+	for i, pcard := range Parameters.Cards {
+		paramStack := pcard.Val.(*Stack)
 		layerVals := MakeStack()
 		for _, _layerVal := range Layers.ToArray() {
+			l := _layerVal.(*etensor.Float32)
+			lv := l.Values
+			fmt.Printf("%d\n", len(lv))
 			layerVal := _layerVal.(*etensor.Float32)
 			layerVals.Add(layerVal.Values[i])
 		}

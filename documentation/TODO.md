@@ -4,8 +4,9 @@
  
  *In order from most important to least important.*
  
- * Fix line 354 @@@@ nn.go
- * Finish replacing all mentions of layers, actions, etc with EmergentStack functions
+ * Discuss additional conference submissions to ARP—might as well submit as talk, rather than just a poster, and see if we get accepted
+ * Finish replacing all mentions of layers with EmergentStack functions (line 1664)
+ * Finish replacing all mentions of actions with EmergentStack functions
  * Run the model, ensuring it produces realistic results
  * Remove all direct references of enviro and intero from `Model.go`; these should be called via some function that iterates over an array in which they're stored.
  * Have system for mapping actions/complex actions in NN to deliberate actions in Unity (complex actions will likely raise some issues with our current system)

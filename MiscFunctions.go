@@ -5,6 +5,7 @@ func clampUI(x float32) float32 {
 }
 
 func clamp(x, min, max float32) (xprime float32) {
+	
 	xprime = x
 	if x > max {
 		xprime = max
@@ -12,4 +13,5 @@ func clamp(x, min, max float32) (xprime float32) {
 		xprime = min
 	}
 	return
+	
 }

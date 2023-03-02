@@ -7,7 +7,7 @@ import (
 // * default TimeIncrement function
 func TimeIncrement(x_ui, dx_ui, tprev_s, tcur_s, dt_s float32) (xprime_ui float32) {
 	
-	// compute xprime
+	// compute x'
 	Δt_s  := tcur_s - tprev_s
 	Δx_ui := Δt_s * (dx_ui / dt_s)
 	xprime_ui = clampUI(x_ui + Δx_ui)
