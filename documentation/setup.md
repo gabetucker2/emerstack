@@ -2,12 +2,12 @@
 
 ## Step 1) Download the prerequisite software
 
-> A) Download [Git](https://git-scm.com/downloads) so that you can clone emerstack to your computer
+> A) Download [Git](https://git-scm.com/downloads) so that you can clone ```emerstack``` to your computer
 
-> B) Download the programming language [Go](https://go.dev/doc/install) so that you can run Go code
+> B) Download the programming language [Go](https://go.dev/doc/install)'s compiler so that you can run Go code
 
 > Windows
->> C) Download [tdm-gcc](https://jmeubank.github.io/tdm-gcc/), which will allow you to compile Emergent scripts
+>> C) Download [tdm-gcc](https://jmeubank.github.io/tdm-gcc/download/), which will allow you to compile Emergent scripts
 >
 >> D) Run the following commands in your terminal to initialize tdm-gcc:
 >> ```
@@ -21,7 +21,7 @@
 >> xcode-select --install
 >> ```
 >
->> D) Download [vulkan](https://vulkan.lunarg.com/), which allows you to render Emergent's user interface
+>> D) Download [vulkan](https://vulkan.lunarg.com/) 64-bit, which allows you to render Emergent's user interface
 
 > E) Restart your computer
 
@@ -31,7 +31,7 @@
 
 > A) Open a [command prompt window](https://www.lifewire.com/how-to-open-command-prompt-2618089)
 
-> B) Navigate to the directory in which you would like to store emerstack
+> B) Navigate to the directory in which you would like to store ```emerstack```
 >> Navigating directories with a [Mac](https://techwiser.com/how-to-navigate-to-a-folder-in-terminal-mac/#:~:text=1%20Method%20I.%20This%20is%20the%20most%20usual,to%20navigate%20to%20a%20folder%20in%20the%20terminal.) PC
 >
 >> Navigating directories with a [Windows](https://techwiser.com/how-to-navigate-to-a-folder-in-terminal-mac/#:~:text=1%20Method%20I.%20This%20is%20the%20most%20usual,to%20navigate%20to%20a%20folder%20in%20the%20terminal.) PC
