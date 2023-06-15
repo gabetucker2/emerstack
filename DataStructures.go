@@ -156,7 +156,7 @@ func InitializeImmutables() {
 func FinishInitializing() {
 	
 	// add a "layerValues" reference to each parameter's corresponding tensor
-	for i, _paramStack := range Parameters.ToArray() {
+	for i, _paramStack := range Parameters.ToArray(RETURN_Stacks) {
 		paramStack := _paramStack.(*Stack)
 		layerVals := MakeStack()
 		for _, _layerVal := range Layers.ToArray() {
