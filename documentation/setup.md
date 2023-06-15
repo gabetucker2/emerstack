@@ -7,7 +7,7 @@
 > B) Download the programming language [Go](https://go.dev/doc/install)'s compiler so that you can run Go code
 
 > Windows
->> C) Download [tdm-gcc](https://jmeubank.github.io/tdm-gcc/download/), which will allow you to compile Emergent scripts
+>> C) Download 64-bit version of [tdm-gcc](https://jmeubank.github.io/tdm-gcc/download/), which will allow you to compile Emergent scripts
 >
 >> D) Run the following commands in your terminal to initialize tdm-gcc:
 >> ```
