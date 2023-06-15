@@ -17,16 +17,19 @@
 >
 >> Navigating directories with a [Windows](https://techwiser.com/how-to-navigate-to-a-folder-in-terminal-mac/#:~:text=1%20Method%20I.%20This%20is%20the%20most%20usual,to%20navigate%20to%20a%20folder%20in%20the%20terminal.) PC
 
-> C) Run the following command in your terminal:
+> C) Clone Emergent to your computer by running the following command:
 >> ```
 >> git clone https://github.com/emer/leabra
 >> ```
 
 ## Step 3) Make a local copy of Emerstack
 
-> A) After leabra finishes cloning to your designated directory, navigate to ```leabra/examples``` in your terminal.
+> A) After leabra finishes cloning to your designated directory, navigate to ```leabra/examples``` with the following command:
+>> ```
+>> cd leabra/examples
+>> ```
 
-> B) Run the following command in your terminal:
+> B) Clone Emerstack to your computer by running the following command:
 >> ```
 >> git clone https://github.com/gabetucker2/emerstack
 >> ```
@@ -37,12 +40,12 @@
 
 *Since we imported Emerstack inside of our Leabra directory, Emerstack is dependent on our Leabra directory's go.mod file.  Therefore, we must run ```go mod tidy``` in our Leabra directory to import the appropriate Emerstack dependencies to its parent directory, Leabra.*
 
-> A) Return to the ```leabra``` directory in your terminal.
+> A) Return to the ```leabra``` directory in your terminal by running the following command:
 >> ```
 >> cd ../
 >> ```
 
-> B) Run the following command in your terminal:
+> B) Import Emerstack dependencies by running the following command:
 >> ```
 >> go mod tidy
 >> ```
@@ -51,9 +54,12 @@
 
 *Check out our other tutorials to learn how to configure Emerstack.  Once you have configured it to your liking, do the following:*
 
-> A) Return to the ```leabra/examples/emerstack``` in your terminal
+> A) Return to the ```leabra/examples/emerstack``` in your terminal by running the following command:
+>> ```
+>> cd examples/leabra
+>> ```
 
-> B) Run the following command in your terminal:
+> B) Build Emerstack by running the following command:
 >> ```
 >> go run .
 >> ```
