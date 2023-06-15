@@ -886,8 +886,8 @@ func main() {
 												
 												// TODO: proceduralize this section.  shouldn't be too hard once you finish figuring out how you are going to order the layer arrays.
 												
-												ss.tsrsStack.Update(REPLACE_Val, en.State("Enviro").(*etensor.Float32), FIND_Key, "EnvpTsr") // previous Environment
-												ss.tsrsStack.Update(REPLACE_Val, en.State("Intero").(*etensor.Float32), FIND_Key, "IntpTsr") // previous Environment
+												ss.tsrsStack.Update(REPLACE_Val, en.State("Environment").(*etensor.Float32), FIND_Key, "EnvpTsr") // previous Environment
+												ss.tsrsStack.Update(REPLACE_Val, en.State("InteroState").(*etensor.Float32), FIND_Key, "IntpTsr") // previous Environment
 												
 												ss.ApplyInputs(&ss.TestEnv)
 												ss.AlphaCyc(false)   // !train
