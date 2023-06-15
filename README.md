@@ -14,5 +14,5 @@ This is the current EmergentStack implementation for the Dynamics project.
 
 > [See our equations for functions in the project](documentation/equations.pdf)
 
-> [See how to set up Emerstack on your computer](documentation/setup.md)
+> [See how to set up emerstack on your computer](documentation/setup.md)
 ---
