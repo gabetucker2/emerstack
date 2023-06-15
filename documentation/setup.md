@@ -2,13 +2,32 @@
 
 ## Step 1) Download the prerequisite software
 
-> Download the programming language [Go](https://go.dev/doc/install) so that you can run Go code
+> A) Download [Git](https://git-scm.com/downloads) so that you can clone emerstack to your computer
 
-> Download [Git](https://git-scm.com/downloads) so that you can clone emerstack to your computer
+> B) Download the programming language [Go](https://go.dev/doc/install) so that you can run Go code
+
+> Windows
+>> C) Download [tdm-gcc](https://jmeubank.github.io/tdm-gcc/), which will allow you to compile Emergent scripts
+>
+>> D) Run the following commands in your terminal to initialize tdm-gcc:
+>> ```
+>> cd C:\TDM-GCC-64
+>> mingwvars.bat
+>> ```
+
+> Mac
+>> C) Run the following command in your terminal, which ensures you have the proper xcode command-line tools installed:
+>> ```
+>> xcode-select --install
+>> ```
+>
+>> D) Download [vulkan](https://vulkan.lunarg.com/), which allows you to render Emergent's user interface
+
+> E) Restart your computer
 
 ## Step 2) Make a local copy of Emergent
 
-*[Leabra](https://en.wikipedia.org/wiki/Leabra) is a biologically-inspired neural network algorithm.  [Dr. Randy O'Reilly](https://en.wikipedia.org/wiki/Randall_C._O%27Reilly) developed an open-source implementation of this algorithm called [Emergent](https://en.wikipedia.org/wiki/Emergent_(software)) that we will be using to implement ```emerstack```.*
+*[Leabra](https://en.wikipedia.org/wiki/Leabra) is a biologically-inspired neural network algorithm.  [Dr. Randy O'Reilly](https://en.wikipedia.org/wiki/Randall_C._O%27Reilly) developed an open-source implementation of this algorithm called [Emergent](https://github.com/emer/emergent) that we will be using to implement ```emerstack```.*
 
 > A) Open a [command prompt window](https://www.lifewire.com/how-to-open-command-prompt-2618089)
 
