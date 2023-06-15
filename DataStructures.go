@@ -2,8 +2,8 @@
 package main
 
 import (
-	. "github.com/gabetucker2/gostack"
 	"github.com/emer/etable/etensor"
+	. "github.com/gabetucker2/gostack"
 )
 
 // * initialize variables

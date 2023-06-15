@@ -9,11 +9,7 @@
 > Windows
 >> C) Download 64-bit version of [tdm-gcc](https://jmeubank.github.io/tdm-gcc/download/), which will allow you to compile Emergent scripts
 >
->> D) Run the following commands in your terminal to initialize tdm-gcc:
->> ```
->> cd C:\TDM-GCC-64
->> mingwvars.bat
->> ```
+>> D) Restart your computer
 
 > Mac
 >> C) Run the following command in your terminal, which ensures you have the proper xcode command-line tools installed:
@@ -22,8 +18,6 @@
 >> ```
 >
 >> D) Download [vulkan](https://vulkan.lunarg.com/) 64-bit, which allows you to render Emergent's user interface
-
-> E) Restart your computer
 
 ## Step 2) Make a local copy of Emergent
 
