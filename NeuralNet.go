@@ -43,6 +43,7 @@ import (
 )
 
 func main() {
+ SetupModel()
 	TheSim.New()
 	TheSim.Config()
 	if len(os.Args) > 1 {
@@ -350,8 +351,8 @@ func main() {
 							
 							func (ss *Sim) ConfigNet(net *leabra.Network) {
 								net.InitName(net, "Dynamic Personality Model")
-								enviro := net.AddLayer2D("Environment", 1, 7, emer.Input)
-								intero := net.AddLayer2D("InteroState", 1, 7, emer.Input) // TODO: @@@@ fix Parameters.Size
+								enviro := net.AddLayer2D("Enviro", 1, 7, emer.Input)
+								intero := net.AddLayer2D("Intero", 1, 7, emer.Input) // TODO: @@@@ fix Parameters.Size
 								
 								app := net.AddLayer2D("Approach", 1, 5, emer.Target)
 								av := net.AddLayer2D("Avoid", 1, 2, emer.Target)
@@ -389,14 +390,14 @@ func main() {
 								// Commands that are used to position the layers in the Netview
 								
 								// TODO: proceduralize intero and enviro
-								app.SetRelPos(relpos.Rel{Rel: relpos.Above, Other: "Environment", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
+								app.SetRelPos(relpos.Rel{Rel: relpos.Above, Other: "Enviro", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
 								hid.SetRelPos(relpos.Rel{Rel: relpos.Above, Other: "Approach", YAlign: relpos.Front, XAlign: relpos.Left, YOffset: 0})
 								beh.SetRelPos(relpos.Rel{Rel: relpos.Above, Other: "Hidden", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
 								
-								intero.SetRelPos(relpos.Rel{Rel: relpos.RightOf, Other: "Environment", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
+								intero.SetRelPos(relpos.Rel{Rel: relpos.RightOf, Other: "Enviro", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
 								av.SetRelPos(relpos.Rel{Rel: relpos.RightOf, Other: "Approach", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
 								motb.SetRelPos(relpos.Rel{Rel: relpos.RightOf, Other: "Avoid", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
-								vta.SetRelPos(relpos.Rel{Rel: relpos.RightOf, Other: "InteroState", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
+								vta.SetRelPos(relpos.Rel{Rel: relpos.RightOf, Other: "Intero", YAlign: relpos.Front, XAlign: relpos.Right, XOffset: 1})
 								
 								// note: can set these to do parallel threaded computation across multiple cpus
 								// not worth it for this small of a model, but definitely helps for larger ones
@@ -538,7 +539,7 @@ func main() {
 										ss.Net.InitExt() // clear any existing inputs -- not strictly necessary if always
 										// going to the same layers, but good practice and cheap anyway
 										
-										lays := []string{"Environment", "InteroState", "Approach", "Avoid", "Behavior", "VTA_DA", "MotiveBias"}
+										lays := []string{"Enviro", "Intero", "Approach", "Avoid", "Behavior", "VTA_DA", "MotiveBias"}
 										for _, lnm := range lays {
 											ly := ss.Net.LayerByName(lnm).(leabra.LeabraLayer).AsLeabra()
 											pats := en.State(ly.Nm)
@@ -740,26 +741,26 @@ func main() {
 													ss.Net.OpenWtsJSON("trained.wts")
 													// Define Approach and Avoid as Input layers
 													// Define Behavior as a Target layer
-													ss.Net.LayerByName("Environment").SetType(emer.Input)
-													ss.Net.LayerByName("InteroState").SetType(emer.Input)
+													ss.Net.LayerByName("Enviro").SetType(emer.Input)
+													ss.Net.LayerByName("Intero").SetType(emer.Input)
 													ss.Net.LayerByName("Approach").SetType(emer.Input)
 													ss.Net.LayerByName("Avoid").SetType(emer.Input)
 													ss.Net.LayerByName("Behavior").SetType(emer.Target)
 													// Lesion Environment and InteroState layers
-													ss.Net.LayerByName("Environment").SetOff(true)
-													ss.Net.LayerByName("InteroState").SetOff(true)
+													ss.Net.LayerByName("Enviro").SetOff(true)
+													ss.Net.LayerByName("Intero").SetOff(true)
 													ss.Train()
 													// Unlesion Environment and InteroState layers
-													ss.Net.LayerByName("Environment").SetOff(false)
-													ss.Net.LayerByName("InteroState").SetOff(false)
+													ss.Net.LayerByName("Enviro").SetOff(false)
+													ss.Net.LayerByName("Intero").SetOff(false)
 													// Save weights
 													ss.Net.SaveWtsJSON("trained.wts")
 													// Define Environment and InteroState as Input layers
 													// Define Approach and Avoid as Target layers
 													// Define Behavior as a Target layer
 													// Makes sure that layers are set to default.
-													ss.Net.LayerByName("Environment").SetType(emer.Input)
-													ss.Net.LayerByName("InteroState").SetType(emer.Input)
+													ss.Net.LayerByName("Enviro").SetType(emer.Input)
+													ss.Net.LayerByName("Intero").SetType(emer.Input)
 													ss.Net.LayerByName("Approach").SetType(emer.Target)
 													ss.Net.LayerByName("Avoid").SetType(emer.Target)	
 													ss.Net.LayerByName("Behavior").SetType(emer.Target)
@@ -777,8 +778,8 @@ func main() {
 													// Define Environment and InteroState as Input layers
 													// Define Approach and Avoid as Target layers
 													// Define Behavior as a Compare layer
-													ss.Net.LayerByName("Environment").SetType(emer.Input)
-													ss.Net.LayerByName("InteroState").SetType(emer.Input)
+													ss.Net.LayerByName("Enviro").SetType(emer.Input)
+													ss.Net.LayerByName("Intero").SetType(emer.Input)
 													ss.Net.LayerByName("Approach").SetType(emer.Target)
 													ss.Net.LayerByName("Avoid").SetType(emer.Target)
 													ss.Net.LayerByName("Behavior").SetType(emer.Target)
@@ -801,8 +802,8 @@ func main() {
 													// Define Behavior as a Target layer
 													// Makes sure that layers are set to default.
 													
-													ss.Net.LayerByName("Environment").SetType(emer.Input)
-													ss.Net.LayerByName("InteroState").SetType(emer.Input)
+													ss.Net.LayerByName("Enviro").SetType(emer.Input)
+													ss.Net.LayerByName("Intero").SetType(emer.Input)
 													ss.Net.LayerByName("Approach").SetType(emer.Target)
 													ss.Net.LayerByName("Avoid").SetType(emer.Target)	
 													ss.Net.LayerByName("Behavior").SetType(emer.Target)
@@ -881,13 +882,13 @@ func main() {
 											// should we put the if statement here and then the function call that updates the WorldState?
 											if ss.TestEnv.Trial.Cur < 1 { 
 												// Code to read input values for Environment and Interoceptive State
-												//		ss.ValsTsr("Envp") = en.State("Environment") // previous Environment
-												//		ss.ValsTsr("Intp") = en.State("InteroState")	  // previous InteroState
+												//		ss.ValsTsr("Envp") = en.State("Enviro") // previous Environment
+												//		ss.ValsTsr("Intp") = en.State("Intero")	  // previous InteroState	
 												
 												// TODO: proceduralize this section.  shouldn't be too hard once you finish figuring out how you are going to order the layer arrays.
 												
-												ss.tsrsStack.Update(REPLACE_Val, en.State("Environment").(*etensor.Float32), FIND_Key, "EnvpTsr") // previous Environment
-												ss.tsrsStack.Update(REPLACE_Val, en.State("InteroState").(*etensor.Float32), FIND_Key, "IntpTsr") // previous Environment
+												ss.tsrsStack.Update(REPLACE_Val, en.State("Enviro").(*etensor.Float32), FIND_Key, "EnvpTsr") // previous Environment
+												ss.tsrsStack.Update(REPLACE_Val, en.State("Intero").(*etensor.Float32), FIND_Key, "IntpTsr") // previous Environment
 												
 												ss.ApplyInputs(&ss.TestEnv)
 												ss.AlphaCyc(false)   // !train
@@ -911,8 +912,8 @@ func main() {
 													// take envp, intp, and beh and then with the following, calculate new World State
 													// 		en := &ss.TestEnv  // already assigned in "if statement" 
 													
-													// envc := en.State("Environment").(*etensor.Float32) // exogenous Changes to current Environment
-													// intc := en.State("InteroState").(*etensor.Float32)	  // exogenous Changes to current InteroState
+													// envc := en.State("Enviro").(*etensor.Float32) // exogenous Changes to current Environment
+													// intc := en.State("Intero").(*etensor.Float32)	  // exogenous Changes to current InteroState
 													// Are there exogenous changes to Interostate?  maybe we don't need intc.
 													
 													// TODO: discuss envp and intp tensors: do we need them if we're plotting to a csv each frame?
@@ -925,8 +926,6 @@ func main() {
 													intero := ss.tsrsStack.Get(FIND_Key, "intero").Val.(*etensor.Float32)   // This is used to create new InteroState representation
 													
 													layerTensors := MakeStack(Layers.ToArray(RETURN_Keys), []*etensor.Float32{enviro, intero}) // * dummy stack until you can figure out how to procedurally add EnviroTsr and InteroTsr
-													
-													SetupModel() // TODO: reorder setup model contingent on how you decide to deal with layerTensors (current implementation doesn't work sicne Layers isn't initialized yet)
 													
 													// Then calculate new enviro and new intero which will be written to the World datatable
 													// This code takes the tensor from the Behavior layer and then finds the index of the most strongly activated behavior.
@@ -1132,8 +1131,8 @@ func main() {
 												dt.SetMetaData("desc", "Training patterns")
 												dt.SetFromSchema(etable.Schema{
 													{"Name", etensor.STRING, nil, nil},
-													{"Environment", etensor.FLOAT32, []int{1, 7}, []string{"Y", "X"}},
-													{"InteroState", etensor.FLOAT32, []int{1, 7}, []string{"Y", "X"}},
+													{"Enviro", etensor.FLOAT32, []int{1, 7}, []string{"Y", "X"}},
+													{"Intero", etensor.FLOAT32, []int{1, 7}, []string{"Y", "X"}},
 													{"Approach", etensor.FLOAT32, []int{1, 5}, []string{"Y", "X"}},
 													{"Avoid", etensor.FLOAT32, []int{1, 2}, []string{"Y", "X"}},
 													{"Behavior", etensor.FLOAT32, []int{1, 12}, []string{"Y", "X"}},
@@ -1324,8 +1323,8 @@ func main() {
 															func (ss *Sim) LogTstTrl(dt *etable.Table) {
 																epc := ss.TrainEnv.Epoch.Prv // this is triggered by increment so use previous value
 																// TODO: proceduralize this section.  shouldn't be too hard.
-																enviro := ss.Net.LayerByName("Environment").(leabra.LeabraLayer).AsLeabra()
-																intero := ss.Net.LayerByName("InteroState").(leabra.LeabraLayer).AsLeabra()
+																enviro := ss.Net.LayerByName("Enviro").(leabra.LeabraLayer).AsLeabra()
+																intero := ss.Net.LayerByName("Intero").(leabra.LeabraLayer).AsLeabra()
 																app := ss.Net.LayerByName("Approach").(leabra.LeabraLayer).AsLeabra()
 																av := ss.Net.LayerByName("Avoid").(leabra.LeabraLayer).AsLeabra()
 																beh := ss.Net.LayerByName("Behavior").(leabra.LeabraLayer).AsLeabra()
@@ -1349,8 +1348,8 @@ func main() {
 																	ly := ss.Net.LayerByName(lnm).(leabra.LeabraLayer).AsLeabra()
 																	dt.SetCellFloat(ly.Nm+" ActM.Avg", row, float64(ly.Pools[0].ActM.Avg))
 																}
-																envt := ss.ValsTsr("Environment")
-																intt := ss.ValsTsr("InteroState")
+																envt := ss.ValsTsr("Enviro")
+																intt := ss.ValsTsr("Intero")
 																appt := ss.ValsTsr("Approach")
 																avt := ss.ValsTsr("Avoid")
 																beht := ss.ValsTsr("Behavior")
@@ -1377,8 +1376,8 @@ func main() {
 															
 															func (ss *Sim) ConfigTstTrlLog(dt *etable.Table) {
 																// TODO: proceduralize this section.  shouldn't be too hard.
-																enviro := ss.Net.LayerByName("Environment").(leabra.LeabraLayer).AsLeabra()
-																intero := ss.Net.LayerByName("InteroState").(leabra.LeabraLayer).AsLeabra()
+																enviro := ss.Net.LayerByName("Enviro").(leabra.LeabraLayer).AsLeabra()
+																intero := ss.Net.LayerByName("Intero").(leabra.LeabraLayer).AsLeabra()
 																app := ss.Net.LayerByName("Approach").(leabra.LeabraLayer).AsLeabra()
 																av := ss.Net.LayerByName("Avoid").(leabra.LeabraLayer).AsLeabra()
 																beh := ss.Net.LayerByName("Behavior").(leabra.LeabraLayer).AsLeabra()
@@ -1661,7 +1660,7 @@ func main() {
 																			
 																			nv.ConfigLabels(labs)
 																			
-																			lays := []string{"Environment", "InteroState", "Approach", "Avoid","Behavior"}
+																			lays := []string{"Enviro", "Intero", "Approach", "Avoid","Behavior"}
 																			
 																			for li, lnm := range lays {
 																				ly := nv.LayerByName(lnm)

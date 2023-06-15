@@ -2,7 +2,7 @@
 	"Network": "Dynamic Personality Model",
 	"Layers": [
 		{
-			"Layer": "Environment",
+			"Layer": "Enviro",
 			"MetaData": {
 				"ActMAvg": "0.15",
 				"ActPAvg": "0.15"
@@ -10,7 +10,7 @@
 			"Prjns": null
 		},
 		{
-			"Layer": "InteroState",
+			"Layer": "Intero",
 			"MetaData": {
 				"ActMAvg": "0.15",
 				"ActPAvg": "0.15"
@@ -25,7 +25,7 @@
 			},
 			"Prjns": [
 				{
-					"From": "Environment",
+					"From": "Enviro",
 					"MetaData": {
 						"GScale": "1"
 					},
@@ -63,7 +63,7 @@
 					]
 				},
 				{
-					"From": "InteroState",
+					"From": "Intero",
 					"MetaData": {
 						"GScale": "1"
 					},
@@ -224,7 +224,7 @@
 			},
 			"Prjns": [
 				{
-					"From": "Environment",
+					"From": "Enviro",
 					"MetaData": {
 						"GScale": "1"
 					},
@@ -244,7 +244,7 @@
 					]
 				},
 				{
-					"From": "InteroState",
+					"From": "Intero",
 					"MetaData": {
 						"GScale": "1"
 					},
