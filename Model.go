@@ -2,9 +2,6 @@
 package main
 
 import (
-	"fmt"
-	"reflect"
-
 	"github.com/emer/etable/etensor"
 	. "github.com/gabetucker2/gostack"
 )
@@ -516,8 +513,6 @@ func SetupModel() {
 	////////////////////////////////////////////////////////////////////
 	// STOP EDITING
 	
-	Parameters.Print()
-	fmt.Println(reflect.TypeOf(Parameters.ToArray(RETURN_Stacks)[0].(*Stack)))
 	FinishInitializing()
 
 }
