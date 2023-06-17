@@ -17,7 +17,7 @@ func TimeIncrement(x_ui, dx_ui, tprev_s, tcur_s, dt_s float32) (xprime_ui float3
 	
 }
 
-// * default EnviroUnityToNN function 
+// * default EnviroUnityToNN function
 func EnviroUnityToNN(d_unity, a float32) (d_NN float32) {
 	
 	// compute d_NN
