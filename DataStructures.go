@@ -154,22 +154,17 @@ func InitializeImmutables() {
 
 // Finish initializing the model
 func FinishInitializing() {
-	
+
 	// add a "layerValues" reference to each parameter's corresponding tensor
-	for i, _paramStack := range Parameters.ToArray(RETURN_Stacks) {
-		paramStack := _paramStack.(*Stack)
-		layerVals := MakeStack()
-		for _, _layerVal := range Layers.ToArray() {
-			layerVal := _layerVal.(*etensor.Float32)
-			layerVals.Add(layerVal.Values[i])
-		}
-		insertStack := MakeStack(Layers.GetMany(nil, nil, RETURN_Keys), layerVals)
+	for _, paramCard := range Parameters.Cards {
+		paramStack := paramCard.Val.(*Stack)
+		insertStack := MakeStack(Layers.GetMany(nil, nil, RETURN_Keys), Layers)
 		paramStack.Add(MakeCard("layerValues", insertStack), ORDER_Before, FIND_First)
 	}
 
 	// fill up the tsrsStack property in Sim
 	TheSim.tsrsStack = Layers.Clone()
-	for _, layer := range Layers.ToArray() {
+	for _, layer := range Layers.ToArray(RETURN_Keys) {
 		var prevTsr *etensor.Float32
 		TheSim.tsrsStack.Add(MakeCard(layer.(string) + "Prev", prevTsr))
 	}
