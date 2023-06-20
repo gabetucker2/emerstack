@@ -18,6 +18,8 @@
 >> ```
 >
 >> D) Download [vulkan](https://vulkan.lunarg.com/) 64-bit, which allows you to render Emergent's user interface
+>
+> (NOTE: This tutorial has not yet been tested on a Mac computer, so if you encounter any issues with the setup process as a Mac user, please notify me, Gabe, at [tucker.854@osu.edu](tucker.854@osu.edu))
 
 ## Step 2) Make a local copy of Emergent
 
