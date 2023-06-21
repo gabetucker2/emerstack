@@ -80,7 +80,7 @@
 >> cd examples/emerstack
 >> ```
 
-> B) Adjust your device's security if it interferes with unrecognized programs running so that it allows emerstack/Go processes to run
+> B) Adjust your device's security if it interferes with unrecognized programs running so that it allows emerstack/Go processes to run (on Windows, disable ```Real-time protection``` under ```Virus & threat protection settings```)
 
 > C) Build ```emerstack``` by running the following command:
 >> ```
