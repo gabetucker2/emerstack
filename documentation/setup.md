@@ -71,7 +71,7 @@
 
 > A) Return to the ```leabra/examples/emerstack``` in your terminal by running the following command:
 >> ```
->> cd examples/leabra
+>> cd examples/emerstack
 >> ```
 
 > B) Build ```emerstack``` by running the following command:
