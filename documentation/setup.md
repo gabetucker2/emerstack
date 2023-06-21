@@ -9,7 +9,13 @@
 > Windows
 >> C) Download 64-bit version of [tdm-gcc](https://jmeubank.github.io/tdm-gcc/download/), which will allow you to compile Emergent scripts
 >
->> D) Restart your computer
+>> D) Run the following commands in your terminal to initialize tdm-gcc:
+>> ```
+>> cd C:\TDM-GCC-64
+>> .\mingwvars.bat
+>> ```
+>
+>> E) Restart your computer
 
 > Mac
 >> C) Run the following command in your terminal, which ensures you have the proper xcode command-line tools installed:
