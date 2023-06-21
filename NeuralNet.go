@@ -522,6 +522,8 @@ func main() {
 										
 										if train {
 											ss.Net.DWt()
+           ss.ViewUpdt.RecordSyns() // critical to update weights
+           ss.Net.WtFmDWt()
 										}
 										if ss.ViewOn && viewUpdt == leabra.AlphaCycle {
 											ss.UpdateView(train)
@@ -887,10 +889,8 @@ func main() {
 												
 												// TODO: proceduralize this section.  shouldn't be too hard once you finish figuring out how you are going to order the layer arrays.
 												
-            fmt.Println(en.State("Enviro")==nil) //!@@@@ THIS SHOULD RETURN FALSE
-
 												ss.tsrsStack.Update(REPLACE_Val, en.State("Enviro").(*etensor.Float32), FIND_Key, "EnvpTsr") // previous Environment
-												ss.tsrsStack.Update(REPLACE_Val, en.State("Intero").(*etensor.Float32), FIND_Key, "IntpTsr") // previous Environment
+												ss.tsrsStack.Update(REPLACE_Val, en.State("Intero").(*etensor.Float32), FIND_Key, "IntpTsr") // previous Intero
 												
 												ss.ApplyInputs(&ss.TestEnv)
 												ss.AlphaCyc(false)   // !train
@@ -924,8 +924,8 @@ func main() {
 													// intp := ss.IntpTsr
 													
 													// TODO: replace this with layerTensors; see EnviroTsr initialization to-do comment
-													enviro := ss.tsrsStack.Get(FIND_Key, "enviro").Val.(*etensor.Float32)  // This is used to create new Environment representation
-													intero := ss.tsrsStack.Get(FIND_Key, "intero").Val.(*etensor.Float32)   // This is used to create new InteroState representation
+													enviro := ss.tsrsStack.Get(FIND_Key, "Enviro").Val.(*etensor.Float32)  // This is used to create new Environment representation
+													intero := ss.tsrsStack.Get(FIND_Key, "Intero").Val.(*etensor.Float32)   // This is used to create new InteroState representation
 													
 													layerTensors := MakeStack(Layers.ToArray(RETURN_Keys), []*etensor.Float32{enviro, intero}) // * dummy stack until you can figure out how to procedurally add EnviroTsr and InteroTsr
 													
@@ -1154,14 +1154,14 @@ func main() {
 												*/
 												
 												func (ss *Sim) OpenPats() {
-													ss.Instr.OpenCSV("data/instr.tsv", etable.Tab) // Instrumental training data
+													ss.Instr.OpenCSV("data/current/instr.tsv", etable.Tab) // Instrumental training data
 													// ss.OpenPatAsset(ss.Hard, "hard.tsv", "Hard", "Hard Training patterns")
-													ss.Pvlv.OpenCSV("data/pvlv.tsv", etable.Tab) // Pavlovian training data
+													ss.Pvlv.OpenCSV("data/current/pvlv.tsv", etable.Tab) // Pavlovian training data
 													// ss.OpenPatAsset(ss.Impossible, "impossible.tsv", "Impossible", "Impossible Training patterns")
-													ss.Trn.OpenCSV("data/InstrThenPvlv.tsv", etable.Tab) // Order of training and number of epochs for each, 
+													ss.Trn.OpenCSV("data/current/InstrThenPvlv.tsv", etable.Tab) // Order of training and number of epochs for each, 
 													// Pavlov first or Instrumental first. Should eventually create menu to choose.
 													//
-													ss.World.OpenCSV("data/World.tsv", etable.Tab) // Current state of the World	
+													ss.World.OpenCSV("data/current/World.tsv", etable.Tab) // Current state of the World	
 													// ss.WorldChanges.OpenCSV("WorldChanges.tsv", etable.Tab) // Exogenous changes in State of the World
 													
 													// Currently the program is set up so that when first read in, the first row of World represents the initial state of the world
@@ -1750,7 +1750,7 @@ func main() {
 																				act.SetActiveStateUpdt(!ss.IsRunning)
 																				}}, win.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 																					ss.Init()
-																					vp.SetNeedsFullRender()
+																					vp.SetNeedsFullRender() // ! @@@@@@ this line is crashing during Init button
 																				})
 																				tbar.AddAction(gi.ActOpts{Label: "TrainPIT", Icon: "run", Tooltip: "This runs the Pavlovian and Instrumental training in the sequence and number of Epochs defined by a file that is read in.",
 																				UpdateFunc: func(act *gi.Action) {
