@@ -8,7 +8,7 @@ This is the current EmergentStack implementation for the Dynamics project.
 
 > [See our TODO list](documentation/TODO.md)
 
-> [See what our data.md folder contains](documentation/data.md)
+> [See what our data folder contains](documentation/data.md)
 
 > [See our archived Emergent documentation](documentation/OldEmergentDoc.md)
 
