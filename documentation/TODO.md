@@ -4,6 +4,7 @@
  
  *In order from most important to least important.*
  
+ * INTEGRATE [data.md](data.md) CONTENTS INTO THIS TODO LIST 
  * Fix line 354 @@@@ nn.go
  * Finish replacing all mentions of layers, actions, etc with EmergentStack functions
  * Run the model, ensuring it produces realistic results

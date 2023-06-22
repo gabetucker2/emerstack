@@ -522,8 +522,8 @@ func main() {
 										
 										if train {
 											ss.Net.DWt()
-        //    ss.ViewUpdt.RecordSyns() // critical to update weights // ! @@@@@@@@ error here, outdated vulkan version
-           ss.Net.WtFmDWt()
+        									//    ss.ViewUpdt.RecordSyns() // critical to update weights // ! @@@@@@@@ error here, outdated vulkan version
+           									ss.Net.WtFmDWt()
 										}
 										if ss.ViewOn && viewUpdt == leabra.AlphaCycle {
 											ss.UpdateView(train)
