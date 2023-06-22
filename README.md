@@ -18,5 +18,5 @@ This is the current EmergentStack implementation for the Dynamics project.
 
 > [See how to set up emerstack on your computer](documentation/setup.md)
 
-> [Check out how Unity-to-Go and (vice versa) communication works](https://github.com/gabetucker2/pipeline-gocsharp)
+> [Check out how Unity-to-Go (and vice versa) communication works](https://github.com/gabetucker2/pipeline-gocsharp)
 ---
