@@ -8,7 +8,7 @@
 
 make sure trained.wts goes to data rather than directory head
 
-"init" crashes, ignore for the time being since windows rendering error
+"init" crashes for me not for MAC/Dr. Read, ignore for the time being since windows rendering error
 "dynamics" doesnts
 "train" doesnt
 "train PIT" doesnt
