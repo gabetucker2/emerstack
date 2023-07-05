@@ -606,7 +606,7 @@ func main() {
 										ss.TestEnv.Init(run)
 										ss.Time.Reset()
 										ss.Net.InitWts()
-										ss.Net.SaveWtsJSON("trained.wts")
+										ss.Net.SaveWtsJSON("data/current/trained.wts")
 										ss.InitStats()
 										ss.TrnEpcLog.SetNumRows(0)
 										ss.TstEpcLog.SetNumRows(0)
@@ -740,7 +740,7 @@ func main() {
 													
 													// Load saved weights
 													// OpenWtsJSON opens trained weights
-													ss.Net.OpenWtsJSON("trained.wts")
+													ss.Net.OpenWtsJSON("data/current/trained.wts")
 													// Define Approach and Avoid as Input layers
 													// Define Behavior as a Target layer
 													ss.Net.LayerByName("Enviro").SetType(emer.Input)
@@ -756,7 +756,7 @@ func main() {
 													ss.Net.LayerByName("Enviro").SetOff(false)
 													ss.Net.LayerByName("Intero").SetOff(false)
 													// Save weights
-													ss.Net.SaveWtsJSON("trained.wts")
+													ss.Net.SaveWtsJSON("data/current/trained.wts")
 													// Define Environment and InteroState as Input layers
 													// Define Approach and Avoid as Target layers
 													// Define Behavior as a Target layer
@@ -787,7 +787,7 @@ func main() {
 													ss.Net.LayerByName("Behavior").SetType(emer.Target)
 													
 													// Load saved weights
-													ss.Net.OpenWtsJSON("trained.wts")
+													ss.Net.OpenWtsJSON("data/current/trained.wts")
 													// Lesion Hidden layer and Behavior layer
 													ss.Net.LayerByName("Hidden").SetOff(true)
 													ss.Net.LayerByName("Behavior").SetOff(true)
@@ -798,7 +798,7 @@ func main() {
 													ss.Net.LayerByName("Hidden").SetOff(false)
 													ss.Net.LayerByName("Behavior").SetOff(false)
 													// Save weights
-													ss.Net.SaveWtsJSON("trained.wts")
+													ss.Net.SaveWtsJSON("data/current/trained.wts")
 													// Define Environment and InteroState as Input layers
 													// Define Approach and Avoid as Target layers
 													// Define Behavior as a Target layer
